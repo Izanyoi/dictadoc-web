@@ -1,0 +1,94 @@
+:root {
+    --off-black: #323232;
+    --slight-blue: #142850;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+    color: inherit;
+}
+
+#TopBar {
+    position: fixed;
+    top: 0;
+    height: 4em;
+    width: 100%;
+    display: flex;
+    background-color: lightgray;
+    border-bottom: 0.1em solid gray;
+}
+
+#ContentArea {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--off-black)
+}
+
+#CenteredContent {
+    display: flex;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#LeftSide {
+    width: 30em;
+}
+
+#RightSide {
+    margin-left: 5em;
+}
+
+#MainButton {
+    display: inline-flex;
+    margin: 1em auto 1em auto;
+    width: 100%;
+    border-radius: 0.25em;
+    padding: 1em;
+    background-color: lightseagreen;
+    justify-content: center;
+
+    color: white;
+    font-weight: 900;
+}
+
+#BottomBar {
+    position: fixed;
+    bottom: 0;
+    height: 2.5em;
+    width: 100%;
+    display: flex;
+    background-color: lightgray;
+    border-top: 0.1em solid gray;
+    padding: 0 1em 0 1em;
+    align-items: center;
+    gap: 5em;
+}
+
+#TabContainer {
+    position: absolute;
+    right: 1em;
+    display: inline-flex;
+    gap: 0.5em;
+}
+
+.TopBarButton {
+    font-size: 1.2em;
+    padding: 0.8em;
+    background: yellow;
+}
+
+.TopBarButton:hover {
+    background: gray;
+}

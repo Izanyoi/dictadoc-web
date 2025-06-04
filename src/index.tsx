@@ -10,7 +10,7 @@ createRoot(document.getElementById('root')!).render(
             <div id='TabContainer'>
                 <a href='' className='TopBarButton'>Reviews</a>
                 <a href='' className='TopBarButton'>About Us</a>
-                <a href='./app.html' className='TopBarButton'>Login</a>
+                <a href='app.html' className='TopBarButton'>Login</a>
             </div>
         </div>
 

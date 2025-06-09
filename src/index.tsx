@@ -8,6 +8,7 @@ createRoot(document.getElementById('root')!).render(
         <div id='TopBar'>
             <img id='Logo' src='https://placehold.co/400' />
             <div id='TabContainer'>
+                <a href='' className='TopBarButton'>Pricing</a>
                 <a href='' className='TopBarButton'>Reviews</a>
                 <a href='' className='TopBarButton'>About Us</a>
                 <a href='app.html' className='TopBarButton'>Login</a>
@@ -19,7 +20,9 @@ createRoot(document.getElementById('root')!).render(
             <div id='CenteredContent'>
                 <div id='LeftSide'>
                     <h2>The future of medical transcription</h2>
-                    <p>Dictadoc is a student-led startup meant to aid doctors and nurses simplify the process of transcribing patient notes by leveraging AI.</p>
+                    <p>DictaDoc is a student-led canadian startup meant to aid doctors and nurses simplify the process 
+                        of transcribing patient notes by leveraging modern audio-to-text AI. Designed by medical students,
+                        for real professionals.</p>
                     
                     <a id='MainButton' href='./app.html'>Transcribe Now!</a>
 
@@ -27,13 +30,14 @@ createRoot(document.getElementById('root')!).render(
                 </div>
                 
                 <div id='RightSide'>
+                    <h3>Watch our Demo</h3>
                     <img src='https://placehold.co/400' />
                 </div>
             </div>
         </div>
 
         <div id='BottomBar'>
-            <p>Some additional links here, thank you</p>
+            <p>Some additional links here, thank you.</p>
         </div>
     </StrictMode>
 )

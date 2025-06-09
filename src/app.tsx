@@ -1,42 +1,34 @@
-import { StrictMode } from 'react'
+import { StrictMode, createContext } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { Splitter } from './splitter.tsx'
+//Fetch from server with account
+const transcripts = createContext([]);
+const transcripts2 = createContext([]);
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <div>
-            <Splitter
-                direction="horizontal"
-                width={500}
-                height={500}
-                panes={[
-                    {
-                        content: <div style={{
-                            height: '100%',
-                            width: '100%',
-                            backgroundColor: 'red',
-                        }}/>,
-                        initialSize: 100,
-                    }, 
-                    {
-                        content: <div style={{
-                            height: '100%',
-                            width: '100%',
-                            backgroundColor: 'green',
-                        }}/>,
-                        initialSize: 100,
-                    },
-                    {
-                        content: <div style={{
-                            height: '100%',
-                            width: '100%',
-                            backgroundColor: 'blue',
-                        }}/>,
-                        initialSize: 100,
-                    }
-                ]}
-            />
+        <div id='SideBar'>
+            <transcripts.Provider value={bruh}>
+
+            </transcripts.Provider>
+        </div>
+
+        <div id='Main'>
+            <div id='TopBar'>
+
+            </div>
+
+            <div id='EditorTop'>
+                <div id='FixedButtons'>
+                    //This is a comment
+                    <div id='TopButton'>Export</div>
+                    <div id='RecordButton'>Record</div>
+                </div>
+            </div>
+
+            <div id='Editor'>
+
+            </div>
         </div>
     </StrictMode>
 )

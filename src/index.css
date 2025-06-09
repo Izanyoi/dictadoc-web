@@ -40,14 +40,15 @@ a:visited {
     display: flex;
     margin-right: auto;
     margin-left: auto;
+    align-items: center;
 }
 
 #LeftSide {
-    width: 30em;
+    width: 25em;
 }
 
 #RightSide {
-    margin-left: 5em;
+    margin-left: 10em;
 }
 
 #MainButton {
@@ -63,10 +64,14 @@ a:visited {
     font-weight: 900;
 }
 
+#MainButton:hover {
+    background-color: seagreen;
+}
+
 #BottomBar {
     position: fixed;
     bottom: 0;
-    height: 2.5em;
+    height: 3.5em;
     width: 100%;
     display: flex;
     background-color: lightgray;

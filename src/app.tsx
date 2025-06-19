@@ -1,34 +1,50 @@
-import { StrictMode, createContext } from 'react'
+import { StrictMode, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { type TabsState } from './app_data.ts'
+import { Workspace } from './workspace.tsx'
 
-//Fetch from server with account
-const transcripts = createContext([]);
-const transcripts2 = createContext([]);
+import './styles/app.css'
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <div id='SideBar'>
-            <transcripts.Provider value={bruh}>
-
-            </transcripts.Provider>
-        </div>
-
-        <div id='Main'>
-            <div id='TopBar'>
-
-            </div>
-
-            <div id='EditorTop'>
-                <div id='FixedButtons'>
-                    //This is a comment
-                    <div id='TopButton'>Export</div>
-                    <div id='RecordButton'>Record</div>
-                </div>
-            </div>
-
-            <div id='Editor'>
-
-            </div>
-        </div>
+        <App/>   
     </StrictMode>
 )
+
+const initialState: TabsState = {
+    SelectedTab : 0,
+    Tabs : [{name: "Placeholder Tab", id: 0}],
+}
+
+function App() {
+    const [ SidebarExpanded, SetSidebar ] = useState(false);
+    const [ AppState, SetAppState ] = useState(initialState);
+
+    return (
+        <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+        }}>
+            <div id="Sidebar">
+                This is the sidebar. For stuff I suppose.
+            </div>
+
+            <div id="Workspace" style={{width: "100%", height: "90vh"}}>
+                <div id="TabBar">
+                    {AppState.Tabs.map( 
+                        (tab, index) => {
+                            return (
+                                <div className={"Tab " + (index == AppState.SelectedTab ? "Selected" : "")}>
+                                    {tab.name}
+                                </div>
+                            )
+                        }
+                    )}
+                </div>
+
+                <Workspace wId={0} />
+            </div>
+        </div>
+    )
+}

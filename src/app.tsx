@@ -13,7 +13,7 @@ createRoot(document.getElementById('root')!).render(
 
 const initialState: TabsState = {
     SelectedTab : 0,
-    Tabs : [{name: "Placeholder Tab", id: 0}],
+    Tabs : [{title: "Placeholder Tab", id: 1, time: 0, audio: "", transcript: []}],
 }
 
 function App() {
@@ -30,21 +30,9 @@ function App() {
                 This is the sidebar. For stuff I suppose.
             </div>
 
-            <div id="Workspace" style={{width: "100%", height: "90vh"}}>
-                <div id="TabBar">
-                    {AppState.Tabs.map( 
-                        (tab, index) => {
-                            return (
-                                <div className={"Tab " + (index == AppState.SelectedTab ? "Selected" : "")}>
-                                    {tab.name}
-                                </div>
-                            )
-                        }
-                    )}
+                <div id="Workspace" style={{width: "100%", height: "100vh"}}>
+                    <Workspace Id={1} />
                 </div>
-
-                <Workspace wId={0} />
-            </div>
         </div>
     )
 }

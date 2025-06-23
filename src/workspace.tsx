@@ -1,48 +1,30 @@
-import { useState, useEffect, useRef } from 'react';
-import { type TranscriptData, Load } from './app_data';
+import { useEffect, useRef } from 'react';
+import { useTranscriptStore} from './app_data';
+import { useAudioStore } from './audio';
 
 import './styles/workspace.css'
 
-declare global {
-    interface Window {
-        forceUpdate: () => void;
-    }
-}
 
-export function Workspace ({wId} : {wId: number}) {
-    const [ Transcripts, setTranscripts ] = useState<TranscriptData[]>([]);
+export function Workspace ({Id} : {Id: number}) {
+    const transcript = useTranscriptStore(state => state.transcripts[Id]);
 
     const transcriptRefs = useRef<(HTMLDivElement | null)[]>([]);
     const searchQuery = useRef("");
     const searchIndex = useRef(0);
 
-    // For testing purposes, remove later
-    window.forceUpdate = () => {
-        const copy = Transcripts.slice(0);
-        copy.push({
-            speaker: "Name",
-            timing: 90,
-            content: "This was pushed via forceUpdate()"
-        });
-        setTranscripts(copy);
-    };
-
-    // Loads in the transcript
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await Load(wId);
-            setTranscripts(data);
-        };
-
-        fetchData();
-    }, [wId]);
+    // Load transcript if not already in store
+    useEffect(() => {    
+        if (!transcript) {
+            useTranscriptStore.getState().loadTranscript(Id).catch(err => console.error(err));
+        }
+    }, [Id, transcript]);
 
     // Called when the search is changed
     const handleSearch = (query: string) => {
         searchIndex.current = 0;
         searchQuery.current = query;
 
-        const index = Transcripts.findIndex(t => 
+        const index = transcript.transcript.findIndex(t => 
             t.content.toLowerCase().includes(query.toLowerCase())
         );
 
@@ -54,8 +36,8 @@ export function Workspace ({wId} : {wId: number}) {
  
     // Gets next search result
     const handleNext = () => {
-        for (let i = searchIndex.current + 1; i < Transcripts.length; i++) {
-            if (Transcripts[i].content.toLowerCase().includes(searchQuery.current.toLowerCase())) {
+        for (let i = searchIndex.current + 1; i < transcript.transcript.length; i++) {
+            if (transcript.transcript[i].content.toLowerCase().includes(searchQuery.current.toLowerCase())) {
                 transcriptRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 searchIndex.current = i;
 
@@ -69,7 +51,7 @@ export function Workspace ({wId} : {wId: number}) {
     // Gets previous search result
     const handlePrev = () => {
         for (let i = searchIndex.current - 1; i >= 0; i--) {
-            if (Transcripts[i].content.toLowerCase().includes(searchQuery.current.toLowerCase())) {
+            if (transcript.transcript[i].content.toLowerCase().includes(searchQuery.current.toLowerCase())) {
                 transcriptRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 searchIndex.current = i;
 
@@ -85,8 +67,8 @@ export function Workspace ({wId} : {wId: number}) {
         <div id='Main'>
             <div id='TopBar'>
                 <div id="TranscriptName">
-                    <h2>Transcript Name</h2>
-                    <p>16/06/2025</p>
+                    <h2>{transcript.title}</h2>
+                    <p>{transcript.time}</p>
                 </div>
                
                 <div id="CenterContainer">
@@ -109,14 +91,15 @@ export function Workspace ({wId} : {wId: number}) {
                     </div>
                 </div>
                 
-                <div id="RecordButton">
+                <div id="RecordButton"
+                    onClick={() => {useAudioStore.getState().startRecording(Id)}}>
                     <img src='/mic.svg' />
                     Record 
                 </div>
             </div>
 
             <div id="TranscriptBox">
-                {Transcripts.map(
+                {transcript.transcript.map(
                     (data, index) => {
                         return (
                             <div className="Transcript"

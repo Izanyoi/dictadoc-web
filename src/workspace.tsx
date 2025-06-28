@@ -1,74 +1,99 @@
-import { useEffect, useRef } from 'react';
-import { useTranscriptStore} from './app_data';
-import { useAudioStore } from './audio';
+import { useEffect, useRef } from 'react'
+import { useMetadataStore, useTranscriptContentStore, useLoadFullTranscript } from './transcript_data'
+import { useAudioStore } from './audio'
 
 import './styles/workspace.css'
 
-
-export function Workspace ({Id} : {Id: number}) {
-    const transcript = useTranscriptStore(state => state.transcripts[Id]);
+export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
+    const metadata = useMetadataStore(state => state.metadata[Tid]);
+    const transcriptContent = useTranscriptContentStore(state => state.transcriptContent[Tid]);
+    const loadFullTranscript = useLoadFullTranscript();
 
     const transcriptRefs = useRef<(HTMLDivElement | null)[]>([]);
     const searchQuery = useRef("");
-    const searchIndex = useRef(0);
+    const searchResults = useRef<number[]>([]);
+    const currentSearchIndex = useRef(0);
 
     // Load transcript if not already in store
     useEffect(() => {    
-        if (!transcript) {
-            useTranscriptStore.getState().loadTranscript(Id).catch(err => console.error(err));
+        if (!metadata || !transcriptContent) {
+            loadFullTranscript(Tid).catch(err => console.error(err));
         }
-    }, [Id, transcript]);
+    }, [Tid, metadata, transcriptContent, loadFullTranscript]);
+
+    // Early return if data is not loaded yet
+    if (!metadata || !transcriptContent) {
+        return <div>Loading...</div>;
+    }
 
     // Called when the search is changed
     const handleSearch = (query: string) => {
-        searchIndex.current = 0;
         searchQuery.current = query;
+        currentSearchIndex.current = 0;
+        
+        if (!query.trim()) {
+            searchResults.current = [];
+            return;
+        }
 
-        const index = transcript.transcript.findIndex(t => 
-            t.content.toLowerCase().includes(query.toLowerCase())
-        );
+        // Find all matching transcript entries
+        searchResults.current = transcriptContent.transcript
+            .map((entry, index) => 
+                entry.content.toLowerCase().includes(query.toLowerCase()) ? index : -1
+            )
+            .filter(index => index !== -1);
 
-        if (index !== -1 && transcriptRefs.current[index]) {
-            transcriptRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            searchIndex.current = index;
+        // Navigate to first result if any found
+        if (searchResults.current.length > 0) {
+            const firstResultIndex = searchResults.current[0];
+            transcriptRefs.current[firstResultIndex]?.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
         }
     };
  
     // Gets next search result
     const handleNext = () => {
-        for (let i = searchIndex.current + 1; i < transcript.transcript.length; i++) {
-            if (transcript.transcript[i].content.toLowerCase().includes(searchQuery.current.toLowerCase())) {
-                transcriptRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                searchIndex.current = i;
-
-                return;
-            }
+        if (searchResults.current.length === 0) {
+            console.log("No search results");
+            return;
         }
 
-        console.log("No Hits");
+        currentSearchIndex.current = (currentSearchIndex.current + 1) % searchResults.current.length;
+        const nextResultIndex = searchResults.current[currentSearchIndex.current];
+        
+        transcriptRefs.current[nextResultIndex]?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
     }
 
     // Gets previous search result
     const handlePrev = () => {
-        for (let i = searchIndex.current - 1; i >= 0; i--) {
-            if (transcript.transcript[i].content.toLowerCase().includes(searchQuery.current.toLowerCase())) {
-                transcriptRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                searchIndex.current = i;
-
-                return;
-            }
+        if (searchResults.current.length === 0) {
+            console.log("No search results");
+            return;
         }
 
-        console.log("No Hits");
+        currentSearchIndex.current = currentSearchIndex.current === 0 
+            ? searchResults.current.length - 1 
+            : currentSearchIndex.current - 1;
+            
+        const prevResultIndex = searchResults.current[currentSearchIndex.current];
+        
+        transcriptRefs.current[prevResultIndex]?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
     }
-
 
     return (
         <div id='Main'>
             <div id='TopBar'>
                 <div id="TranscriptName">
-                    <h2>{transcript.title}</h2>
-                    <p>{transcript.time}</p>
+                    <h2>{metadata.title}</h2>
+                    <p>{metadata.time}</p>
                 </div>
                
                 <div id="CenterContainer">
@@ -92,14 +117,14 @@ export function Workspace ({Id} : {Id: number}) {
                 </div>
                 
                 <div id="RecordButton"
-                    onClick={() => {useAudioStore.getState().startRecording(Id)}}>
+                    onClick={() => {useAudioStore.getState().startRecording(Tid)}}>
                     <img src='/mic.svg' />
                     Record 
                 </div>
             </div>
 
             <div id="TranscriptBox">
-                {transcript.transcript.map(
+                {transcriptContent.transcript.map(
                     (data, index) => {
                         return (
                             <div className="Transcript"

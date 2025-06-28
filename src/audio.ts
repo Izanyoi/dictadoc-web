@@ -1,8 +1,6 @@
 import { create } from 'zustand'
-import { useTranscriptStore } from './app_data';
+import { useTranscriptContentStore } from './transcript_data';
 
-// Start the app by prompting for mic access
-initAudio(false);
 
 async function initAudio(blocking: boolean): Promise<boolean> {
     const fn = async () => {
@@ -22,7 +20,7 @@ async function initAudio(blocking: boolean): Promise<boolean> {
                 const blob = new Blob(state.chunks, { type: "audio/ogg; codecs=opus" });
                 const audioURL = window.URL.createObjectURL(blob);
 
-                useTranscriptStore.getState().updateTranscriptAudio(state.recording, audioURL);
+                useTranscriptContentStore.getState().updateTranscriptAudio(state.recording, audioURL);
 
                 useAudioStore.setState({
                     recording: 0,
@@ -44,6 +42,8 @@ async function initAudio(blocking: boolean): Promise<boolean> {
     }
 }
 
+type AudioStatus = "NoMic" | "Recording" | "Ready";
+
 type AudioStore = {
     recorder: MediaRecorder | null;
 
@@ -54,6 +54,7 @@ type AudioStore = {
     setRecorder: (recorder: MediaRecorder) => void;
     startRecording: (id: number) => void;
     stopRecording: () => void;
+    getStatus: () => AudioStatus;
 }
 
 export const useAudioStore = create<AudioStore>((set, get) => ({
@@ -66,24 +67,33 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     startRecording: async (id) => {
         let recorder = get().recorder;
 
-        // If no recorder exists, try creating one now
-        if (!recorder) {
-            const success = await initAudio(true);
-            if (!success) {
-                console.error("Failed to initialize audio");
+        try {
+            // If no recorder exists, try creating one now
+            if (!recorder) {
+                const success = await initAudio(true);
+                if (!success) {
+                    console.error("Failed to initialize audio");
+                    return;
+                }
+                recorder = get().recorder;
+            }
+
+            if (!recorder) { // for TypeScript satisfaction
+                console.error("Concurrency Issue");
                 return;
             }
-            recorder = get().recorder;
-        }
 
-        if (!recorder) { // for TypeScript satisfaction
-            console.error("Concurrency Issue");
-            return;
-        }
+            set({ recording: id, chunks: [] });
+            recorder.start();
+            console.log("Recording Started");
 
-        set({ recording: id, chunks: [] });
-        recorder.start();
-        console.log("Recording Started");
+        } catch (e) {
+            // If recorder doesn't work, try resetting it
+            if (!await initAudio(true)) {
+                set({ recorder: null });
+                console.log(e);
+            }
+        }
     },
 
     stopRecording: () => {
@@ -91,9 +101,18 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         if (get().recording === 0 || !recorder) return;
 
         recorder.stop();
+    },
+
+    getStatus: () => {
+        if (!get().recorder) { return "NoMic"; }
+        else if (get().recording === 0) { return "Ready"; }
+        else { return "Recording" }
     }
 }));
 
-export function playAudio(id: number, start: number, end: number) {
-    new Audio("a");
+export function playAudio(audio: HTMLAudioElement, start: number, end: number) {
+    audio.currentTime = start;
 }
+
+// Start the app by prompting for mic access
+initAudio(false);

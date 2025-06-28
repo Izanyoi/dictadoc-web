@@ -1,0 +1,83 @@
+#Sidebar {
+    width: 300px;
+    height: 100vh;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    border-right: 1px solid var(--border-light);
+}
+
+#Logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+#Logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+#Controls {
+    display: flex;
+    justify-content: center;
+}
+
+#Controls .Link {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#Controls .Link:hover {
+    background-color: var(--bg-hover);
+    transform: scale(1.05);
+}
+
+.Filters input[type="text"] {
+    width: 270px;
+    margin: 10px;
+    padding: 5px;
+    border: 1px solid var(--border-medium);
+    border-radius: 6px;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.Filters input::placeholder {
+    color: var(--text-muted);
+}
+
+#Entries {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    gap: 0.5em;
+    overflow-y: scroll;
+}
+
+.Tab {
+    padding: 0.5rem 0.75rem;
+    margin: 3px;
+    border-radius: 6px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    overflow: hidden;
+}
+
+.Tab:hover {
+    background-color: var(--bg-hover);
+}
+
+.Selected{
+    background-color: lightsteelblue;
+}

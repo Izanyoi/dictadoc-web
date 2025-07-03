@@ -110,9 +110,42 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     }
 }));
 
-export function playAudio(audio: HTMLAudioElement, start: number, end: number) {
+export function playAudio(audio: HTMLAudioElement, start: number, end?: number) {
+    // Set the audio's current time to the start point
     audio.currentTime = start;
+
+    // Define a handler to stop the audio at the end time
+    let stopHandler: (() => void) | null = null;
+
+    if (typeof end === 'number') {
+        stopHandler = () => {
+            if (audio.currentTime >= end) {
+                audio.pause();
+                audio.removeEventListener('timeupdate', stopHandler!);
+            }
+        };
+        audio.addEventListener('timeupdate', stopHandler);
+    }
+
+    // Start playback
+    audio.play().catch((err) => {
+        console.error('Error playing audio:', err);
+    });
 }
+
+export function formatTimestamp(ms: number): string {
+    const totalMs = Math.floor(ms);
+    const hours = (totalMs / 3600000) | 0;
+    const minutes = ((totalMs % 3600000) / 60000) | 0;
+    const seconds = ((totalMs % 60000) / 1000) | 0;
+
+    return (
+        (hours < 10 ? '0' : '') + hours + ':' +
+        (minutes < 10 ? '0' : '') + minutes + ':' +
+        (seconds < 10 ? '0' : '') + seconds
+    );
+}
+
 
 // Start the app by prompting for mic access
 initAudio(false);

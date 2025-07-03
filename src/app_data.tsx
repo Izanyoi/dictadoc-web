@@ -20,6 +20,7 @@ export const useWorkspaceState = create<WorkspaceStore>() (
                     [Wid]: Tid
                 }
             }))
+            console.log("Set it!")
         }
     }))
 );

@@ -27,11 +27,12 @@
 #Controls {
     display: flex;
     justify-content: center;
+    gap: 20px;
 }
 
 #Controls .Link {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
     border-radius: 4px;
     transition: transform 0.2s ease, background-color 0.2s ease;
@@ -60,13 +61,12 @@
     display: flex;
     height: 100%;
     flex-direction: column;
-    gap: 0.5em;
     overflow-y: scroll;
 }
 
 .Tab {
     padding: 0.5rem 0.75rem;
-    margin: 3px;
+    margin: 1px 3px;
     border-radius: 6px;
     color: var(--text-primary);
     cursor: pointer;
@@ -75,9 +75,10 @@
 }
 
 .Tab:hover {
-    background-color: var(--bg-hover);
+    background-color: white;
+    border: 1px solid var(--accent-light);
 }
 
 .Selected{
-    background-color: lightsteelblue;
+    background-color: lightgrey;
 }

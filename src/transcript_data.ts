@@ -42,6 +42,11 @@ export const useMetadataStore = create<MetadataStore>()(
                 id: 1,
                 title: "Placeholder Transcript",
                 time: 0,
+            },
+            2: {
+                id: 2,
+                title: "Team Meeting Discussion",
+                time: 1800,
             }
         },
 
@@ -139,6 +144,20 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
                     {speaker: "Jane Doe", timing: 1, content: "This is for testing purposes"},
                     {speaker: "John Doe", timing: 2, content: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.".repeat(5)},
                     {speaker: "Jane Doe", timing: 3, content: "Wow, that was long!"}
+                ]
+            },
+            2: {
+                id: 2,
+                audio: "meeting-audio-file.mp3",
+                transcript: [
+                    {speaker: "Alex Rodriguez", timing: 0, content: "Good morning everyone, thanks for joining today's team meeting. Let's start with our quarterly review."}, 
+                    {speaker: "Sarah Chen", timing: 15, content: "I'd like to present the marketing metrics first. We've seen a 23% increase in user engagement this quarter."},
+                    {speaker: "Mike Johnson", timing: 45, content: "That's great news! From the engineering side, we've successfully deployed three major features and resolved 87% of our technical debt."},
+                    {speaker: "Alex Rodriguez", timing: 78, content: "Excellent work team. Sarah, can you elaborate on which campaigns drove the most engagement?"},
+                    {speaker: "Sarah Chen", timing: 95, content: "Absolutely. Our social media campaign 'Connect & Create' was the standout performer, generating 45% more clicks than our previous best. The video content particularly resonated with our target demographic of 25-34 year olds."},
+                    {speaker: "Mike Johnson", timing: 125, content: "Speaking of technical improvements, the new analytics dashboard is now live. It should give us better insights into user behavior patterns."},
+                    {speaker: "Lisa Wang", timing: 150, content: "From a design perspective, the user feedback has been overwhelmingly positive. The new interface reduced user confusion by 60% according to our usability tests."},
+                    {speaker: "Alex Rodriguez", timing: 180, content: "These are fantastic results across all departments. Let's discuss our goals for next quarter and how we can build on this momentum."}
                 ]
             }
         },

@@ -45,7 +45,11 @@ export function Sidebar() {
             </div>
 
             <div id="Controls">
+
+                <img className="Link" src="gear-fill.svg" />
+                <img className="Link" src="person-fill.svg" />
                 <img className="Link" src="bug-fill.svg" />
+                
             </div>
 
             <div className="Filters">
@@ -70,16 +74,17 @@ export function Sidebar() {
 }
 
 function Tab({Tid, title, selected}: {Tid: number, title: string, selected: boolean}) {
+    const workspaceState = useWorkspaceState();
     
     if (!selected) return (
         <div className="Tab"
-            onClick={()=>{useWorkspaceState().setWorkspace(0, Tid)}}    
+            onClick={()=>{workspaceState.setWorkspace(0, Tid)}}    
         >
             {title}
         </div>
     )
     else return (
-        <div className="Tab Selected">
+        <div className="Tab Selected" key={Tid}>
             {title}
         </div>
     )

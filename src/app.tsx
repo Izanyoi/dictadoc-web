@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Workspace } from './workspace.tsx'
 import { Sidebar } from './sidebar.tsx'
+import { useWorkspaceState } from './app_data.tsx'
 
 import './styles/app.css'
 
@@ -13,6 +14,8 @@ createRoot(document.getElementById('root')!).render(
 )
 
 function App() {
+    const transcript = useWorkspaceState(state => state.workspaces[0]);
+    
     return (
         <div style={{
             width: '100%',
@@ -22,7 +25,7 @@ function App() {
 
             <Sidebar />
             <div id="Workspace" style={{width: "100%", height: "100vh"}}>
-                <Workspace Tid={1} Wid={0}/>
+                <Workspace Tid={transcript} Wid={0}/>
             </div>
         </div>
     )

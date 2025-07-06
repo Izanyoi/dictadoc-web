@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useMetadataStore, useTranscriptContentStore, useLoadFullTranscript, type TranscriptEntry } from './transcript_data'
-import { useAudioStore, formatTimestamp } from './audio'
+import { formatTimestamp, playAudio, useAudioStore } from './audio'
 
 import './styles/workspace.css'
 import React from 'react';
+import { RecordButton } from './record_button';
 
 export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
+    const loadFullTranscript = useLoadFullTranscript();
+
     const metadata = useMetadataStore(state => state.metadata[Tid]);
     const transcriptContent = useTranscriptContentStore(state => state.transcriptContent[Tid]);
-    const loadFullTranscript = useLoadFullTranscript();
 
     const transcriptRefs = useRef<HTMLDivElement[]>([]);
     const searchQuery = useRef("");
@@ -16,6 +18,9 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
         results: [] as number[], 
         currentIndex: -1 
     });
+ 
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
 
     // Load transcript if not already in store
     useEffect(() => {    
@@ -24,11 +29,49 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
         }
     }, [Tid, metadata, transcriptContent, loadFullTranscript]);
 
+    useEffect(() => {
+        const load = async () => {
+            // Only load audio if we have the transcript content and audio URL
+            if (!transcriptContent?.audio) {
+                console.log("No audio URL available yet");
+                return;
+            }
+
+            try {
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current = null;
+                }
+
+                const newAudio = new Audio(transcriptContent.audio);
+                
+                // Wait for audio to be ready
+                await new Promise((resolve, reject) => {
+                    newAudio.oncanplaythrough = resolve;
+                    newAudio.onerror = reject;
+                    newAudio.load();
+                });
+
+                audioRef.current = newAudio;
+                console.log("Loaded audio successfully!");
+            } catch (error) {
+                console.error("Failed to load audio:", error);
+            }
+        };
+
+    load();
+}, [transcriptContent?.audio]);
+
     // Reset search when transcript ID changes
     useEffect(() => {
         searchQuery.current = "";
         setSearchState({ results: [], currentIndex: -1 });
-}, [Tid]);
+    }, [Tid]);
+
+    const tryLoadAudio = async () => {
+        const audio = new Audio(transcriptContent.audio);
+        return audio;
+    }
 
     // Called when the search is changed
     const handleSearch = (query: string) => {
@@ -131,48 +174,60 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
                             <button onClick={()=> handleNext()}>▼</button>
                         </div>
                     </div>
+
+                    <div style={{fontSize: '10px', height: '0', margin: '0'}}>
+                        {searchQuery.current.length === 0 
+                            ? ""
+                            : searchState.currentIndex === -1 
+                                ? "No Results Found" 
+                                : `${searchState.currentIndex + 1} of ${searchState.results.length} results`
+                        }
+                    </div>
                 </div>
                 
-                <div id="RecordButton"
-                    onClick={() => {useAudioStore().startRecording(Tid)}}
-                >
-                    <img src='/mic.svg' />
-                    Record 
-                </div>
+                <RecordButton Tid={Tid} />
             </div>
 
             <div id="TranscriptBox">
                 {transcriptContent.transcript.map(
                     (data, index) => {
+                        const endTime = transcriptContent.transcript[index + 1]?.timing;
+
                         return (
-                            <TranscriptEntryComponent 
-                                key={index}
+                            <TranscriptEntryComponent
                                 ref={getTranscriptRef(index)}
                                 index={index} 
                                 data={data} 
                                 selected={searchState.currentIndex >= 0 && searchState.results[searchState.currentIndex] === index}
+                                playCallback={() => {
+                                    if (audioRef.current) playAudio(audioRef.current, data.timing, endTime)
+                                }}
                             />
                         )
+
                     }
-                )}
+                )} 
             </div>
         </div>
     )
 }
 
 const TranscriptEntryComponent = React.memo(
-    function TranscriptEntryComponent({ index, data, selected, ref }: {
-        index: number;
-        data: TranscriptEntry;
-        selected: boolean;
-        ref: (e: HTMLDivElement) => void;
+    function TranscriptEntryComponent({ playCallback, data, selected, ref }: {
+        playCallback: () => void,
+        index: number,
+        data: TranscriptEntry,
+        selected: boolean,
+        ref: (e: HTMLDivElement) => void,
     }) {
         return (
             <div
                 className={`Transcript ${selected ? "Selected" : ""}`}
                 ref={ref}
             >
-                <div className="ReplayButton">
+                <div className="ReplayButton"
+                    onClick={playCallback}
+                >
                     <img src="/play-fill.svg" />
                 </div>
 

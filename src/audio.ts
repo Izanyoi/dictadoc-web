@@ -101,6 +101,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         if (get().recording === 0 || !recorder) return;
 
         recorder.stop();
+        console.log("Stopped recording")
     },
 
     getStatus: () => {
@@ -111,19 +112,16 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 }));
 
 export function playAudio(audio: HTMLAudioElement, start: number, end?: number) {
-    // Set the audio's current time to the start point
     audio.currentTime = start;
 
-    // Define a handler to stop the audio at the end time
-    let stopHandler: (() => void) | null = null;
-
-    if (typeof end === 'number') {
-        stopHandler = () => {
+    if (end) {
+        const stopHandler = () => {
             if (audio.currentTime >= end) {
                 audio.pause();
                 audio.removeEventListener('timeupdate', stopHandler!);
             }
         };
+        
         audio.addEventListener('timeupdate', stopHandler);
     }
 

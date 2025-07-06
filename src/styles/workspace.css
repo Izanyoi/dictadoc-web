@@ -52,7 +52,7 @@ body {
     transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     align-items: center;
     flex: 1;
     max-width: 300px;
@@ -130,7 +130,6 @@ body {
   color: var(--accent-primary);
 }
 
-
 #RecordButton {
     display: flex;
     align-items: center;
@@ -147,6 +146,18 @@ body {
 #RecordButton:hover {
     background: #1d4ed8;
     box-shadow: var(--shadow-subtle);
+}
+
+#RecordButton.Recording {
+    background-color: #ff4d4f;
+    color: white;
+}
+
+#RecordButton.Error {
+    background-color: #ffcccc;
+    color: #990000;
+    padding: 10px;
+    border-radius: 8px;
 }
 
 #SearchInput:focus {

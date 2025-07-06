@@ -148,7 +148,7 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
             },
             2: {
                 id: 2,
-                audio: "meeting-audio-file.mp3",
+                audio: "",
                 transcript: [
                     {speaker: "Alex Rodriguez", timing: 0, content: "Good morning everyone, thanks for joining today's team meeting. Let's start with our quarterly review."}, 
                     {speaker: "Sarah Chen", timing: 15, content: "I'd like to present the marketing metrics first. We've seen a 23% increase in user engagement this quarter."},
@@ -263,7 +263,6 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
     }))
 );
 
-// Utility hook to load both metadata and content together
 export const useLoadFullTranscript = () => {
     const loadMetadata = useMetadataStore(state => state.loadMetadata);
     const loadTranscriptContent = useTranscriptContentStore(state => state.loadTranscriptContent);
@@ -281,7 +280,6 @@ export const useLoadFullTranscript = () => {
     };
 };
 
-// Utility hook to add both metadata and content together
 export const useAddFullTranscript = () => {
     const addMetadata = useMetadataStore(state => state.addMetadata);
     const addTranscriptContent = useTranscriptContentStore(state => state.addTranscriptContent);
@@ -310,7 +308,6 @@ export const useAddFullTranscript = () => {
     };
 };
 
-// Utility hook to remove both metadata and content together
 export const useRemoveFullTranscript = () => {
     const removeMetadata = useMetadataStore(state => state.removeMetadata);
     const removeTranscriptContent = useTranscriptContentStore(state => state.removeTranscriptContent);

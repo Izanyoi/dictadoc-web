@@ -132,7 +132,9 @@ body {
 
 #RecordButton {
     display: flex;
+    width: 80px;
     align-items: center;
+    justify-content: center;
     gap: 0.2em;
     padding: 1em 1.5em 1em 1.5em;
     background: var(--accent-primary);
@@ -140,7 +142,6 @@ body {
     color: white;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
 #RecordButton:hover {
@@ -195,6 +196,7 @@ body {
     display: flex;
     align-content: center;
     justify-content: center;
+    user-select: none;
 }
 
 .ReplayButton:hover {

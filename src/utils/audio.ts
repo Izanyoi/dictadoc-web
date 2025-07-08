@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { useTranscriptContentStore } from './transcript_data';
+import { useTranscriptContentStore } from '../app/transcript_data';
 
 
 async function initAudio(blocking: boolean): Promise<boolean> {
@@ -7,6 +7,7 @@ async function initAudio(blocking: boolean): Promise<boolean> {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             const recorder = new MediaRecorder(stream);
+            useAudioStore.getState().stream = stream;
             useAudioStore.getState().setRecorder(recorder);
 
             recorder.ondataavailable = (e: BlobEvent) => {
@@ -46,6 +47,7 @@ type AudioStatus = "NoMic" | "Recording" | "Ready";
 
 type AudioStore = {
     recorder: MediaRecorder | null;
+    stream: MediaStream | null;
 
     // 0 for none, otherwise ID of the current transcript
     recording: number,
@@ -59,6 +61,7 @@ type AudioStore = {
 
 export const useAudioStore = create<AudioStore>((set, get) => ({
     recorder: null,
+    stream: null,
     recording: 0,
     chunks: [],
 

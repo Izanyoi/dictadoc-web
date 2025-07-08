@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useMetadataStore, useTranscriptContentStore, useLoadFullTranscript, type TranscriptEntry } from './transcript_data'
-import { formatTimestamp, playAudio, useAudioStore } from './audio'
+import { formatTimestamp, playAudio, useAudioStore } from '../utils/audio'
 
-import './styles/workspace.css'
 import React from 'react';
 import { RecordButton } from './record_button';
+
+import '../styles/workspace.css'
+
 
 export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
     const loadFullTranscript = useLoadFullTranscript();
@@ -21,7 +23,7 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
  
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-
+ 
     // Load transcript if not already in store
     useEffect(() => {    
         if (!metadata || !transcriptContent) {
@@ -59,19 +61,14 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
             }
         };
 
-    load();
-}, [transcriptContent?.audio]);
+        load();
+    }, [transcriptContent?.audio]);
 
     // Reset search when transcript ID changes
     useEffect(() => {
         searchQuery.current = "";
         setSearchState({ results: [], currentIndex: -1 });
     }, [Tid]);
-
-    const tryLoadAudio = async () => {
-        const audio = new Audio(transcriptContent.audio);
-        return audio;
-    }
 
     // Called when the search is changed
     const handleSearch = (query: string) => {

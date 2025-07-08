@@ -2,16 +2,18 @@ import { useState } from "react"
 import { useMetadataStore } from "./transcript_data"
 import { useWorkspaceState } from "./app_data";
 
-import './styles/sidebar.css'
+import '../styles/sidebar.css'
 
 
 export function Sidebar() {
+     const metadata = useMetadataStore(state => state.metadata);
+
     const [filters, setFilters] = useState({
         search: '',
         dateRange: { start: null, end: null },
     });
     
-    const metadata = useMetadataStore(state => state.metadata);
+   
     
     // Do ALL filtering in the component, not in the selector
     const filteredAndSorted = Object.values(metadata || {})
@@ -45,11 +47,9 @@ export function Sidebar() {
             </div>
 
             <div id="Controls">
-
                 <img className="Link" src="gear-fill.svg" />
                 <img className="Link" src="person-fill.svg" />
                 <img className="Link" src="bug-fill.svg" />
-                
             </div>
 
             <div className="Filters">
@@ -59,6 +59,13 @@ export function Sidebar() {
                     value={filters.search}
                     onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                 />
+            </div>
+
+            <div id="NewTab" 
+                className="Tab"
+                onClick={() => useWorkspaceState().setWorkspace(0, 0)}
+            >
+                New Transcript
             </div>
 
             <div id="Entries">
@@ -78,6 +85,7 @@ function Tab({Tid, title, selected}: {Tid: number, title: string, selected: bool
     
     if (!selected) return (
         <div className="Tab"
+            key={Tid}
             onClick={()=>{workspaceState.setWorkspace(0, Tid)}}    
         >
             {title}

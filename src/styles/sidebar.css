@@ -68,10 +68,12 @@
     padding: 0.5rem 0.75rem;
     margin: 1px 3px;
     border-radius: 6px;
+    border: 1px solid white;
     color: var(--text-primary);
     cursor: pointer;
     transition: background-color 0.2s ease;
     overflow: hidden;
+    user-select: none;
 }
 
 .Tab:hover {

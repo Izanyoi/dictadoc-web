@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useMetadataStore, useTranscriptContentStore, useLoadFullTranscript, type TranscriptEntry } from './transcript_data'
 import { formatTimestamp, playAudio, useAudioStore } from '../utils/audio'
-
-import React from 'react';
+import { EditableBox } from '../component/editable_box';
 import { RecordButton } from './record_button';
 
+import React from 'react';
+
+
 import '../styles/workspace.css'
+
 
 
 export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
@@ -193,6 +196,7 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
                         return (
                             <TranscriptEntryComponent
                                 ref={getTranscriptRef(index)}
+                                Tid={Tid}
                                 index={index} 
                                 data={data} 
                                 selected={searchState.currentIndex >= 0 && searchState.results[searchState.currentIndex] === index}
@@ -210,13 +214,16 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
 }
 
 const TranscriptEntryComponent = React.memo(
-    function TranscriptEntryComponent({ playCallback, data, selected, ref }: {
+    function TranscriptEntryComponent({ playCallback, Tid, index, data, selected, ref }: {
         playCallback: () => void,
+        Tid: number, 
         index: number,
         data: TranscriptEntry,
         selected: boolean,
         ref: (e: HTMLDivElement) => void,
     }) {
+        const saveEdit = useTranscriptContentStore(state => state.updateTranscriptEntry);
+
         return (
             <div
                 className={`Transcript ${selected ? "Selected" : ""}`}
@@ -233,7 +240,11 @@ const TranscriptEntryComponent = React.memo(
                     <div className="TimestampTag">{formatTimestamp(data.timing)}</div>
                 </div>
 
-                <div className="TranscriptR">{data.content}</div>
+                <div className="TranscriptR">
+                    <EditableBox value={data.content} 
+                        onSave={(updated)=>{saveEdit(Tid, index, {content: updated})}}
+                    /> 
+                </div>
             </div>
         );
     }, (prevProps, nextProps) => {

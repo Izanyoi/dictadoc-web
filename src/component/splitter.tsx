@@ -1,4 +1,4 @@
-import { useState, useRef, Fragment, type ReactNode } from 'react';
+import { useState, useRef, type ReactNode } from 'react';
 
 export type Direction = 'horizontal' | 'vertical';
 
@@ -67,8 +67,41 @@ export function Splitter(props: VSplitterProps | HSplitterProps) {
                 ? e.clientX - container.left
                 : e.clientY - container.top;
       
-            const min = panePositions[index - 1];
-            const max = panePositions[index + 1];
+            // Original constraints based on adjacent panes
+            let min = panePositions[index - 1];
+            let max = panePositions[index + 1];
+            
+            // Apply size constraints, but only if they don't break the layout
+            const leftPane = props.panes[index - 1];
+            const rightPane = props.panes[index];
+            
+            // Calculate potential constraints
+            let potentialMin = min;
+            let potentialMax = max;
+            
+            // Left pane constraints
+            if (leftPane.minSize !== undefined) {
+                potentialMin = Math.max(potentialMin, panePositions[index - 1] + leftPane.minSize);
+            }
+            if (leftPane.maxSize !== undefined) {
+                potentialMax = Math.min(potentialMax, panePositions[index - 1] + leftPane.maxSize);
+            }
+            
+            // Right pane constraints
+            if (rightPane.minSize !== undefined) {
+                potentialMax = Math.min(potentialMax, panePositions[index + 1] - rightPane.minSize);
+            }
+            if (rightPane.maxSize !== undefined) {
+                potentialMin = Math.max(potentialMin, panePositions[index + 1] - rightPane.maxSize);
+            }
+            
+            // Only apply constraints if they don't create an impossible situation
+            if (potentialMin <= potentialMax) {
+                min = potentialMin;
+                max = potentialMax;
+            }
+            // If constraints are impossible, fall back to just the positional constraints
+            
             const clampedPosition = Math.min(Math.max(newPos, min), max);
             
             const newArray = panePositions.slice();
@@ -108,7 +141,7 @@ export function Splitter(props: VSplitterProps | HSplitterProps) {
 
             {props.panes.slice(1).map((pane, index) => {
                 return (
-                    <Fragment>
+                    <>
                         <div className='ResizeBar'
                             onMouseDown={()=>startResize(index + 1)}
                             style={{
@@ -128,7 +161,7 @@ export function Splitter(props: VSplitterProps | HSplitterProps) {
                         }}>
                             {pane.content}
                         </div>
-                    </Fragment>
+                    </>
                 );
             })}    
         </div>

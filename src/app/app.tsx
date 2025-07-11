@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Workspace } from './workspace.tsx'
+import { NewWorkspace } from './new_workspace.tsx'
 import { Sidebar } from './sidebar.tsx'
 import { useWorkspaceState } from './app_data.tsx'
 
@@ -31,12 +32,5 @@ function App() {
                 }
             </div>
         </div>
-    )
-}
-
-function NewWorkspace() {
-    return (
-        <>
-        </>
     )
 }

@@ -1,7 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import './styles/index.css'
+import './styles/index.css';
+import './styles/presets.css';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -17,7 +18,7 @@ createRoot(document.getElementById('root')!).render(
 
 
         <div id='ContentArea'>
-            <div id='CenteredContent'>
+            <div className='Centered'>
                 <div id='LeftSide'>
                     <h2>The future of medical transcription</h2>
                     <p>DictaDoc is a student-led canadian startup meant to aid doctors and nurses simplify the process 

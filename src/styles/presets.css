@@ -1,0 +1,29 @@
+.Centered {
+    display: flex;
+    width: fit-content;
+    margin-right: auto;
+    margin-left: auto;
+    align-items: center;
+}
+
+.Centered::before {
+    content: "";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Full {
+    width: 100%;
+    height: 100%
+}
+
+.HFlex {
+    display: flex;
+    flex-direction: row;
+}
+
+.VFlex {
+    display: flex;
+    flex-direction: column;
+}

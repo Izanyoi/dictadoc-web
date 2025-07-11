@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+
+import '../styles/editable_box.css';
 
 interface EditableBoxProps {
     value: string;
@@ -9,13 +11,19 @@ interface EditableBoxProps {
 export function EditableBox({ value, onSave, className = '' } : EditableBoxProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [tempValue, setTempValue] = useState(value);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         if (isEditing) {
-            inputRef.current?.focus();
+            textareaRef.current?.focus();
+            autoResize();
         }
     }, [isEditing]);
+
+    // Critical for transcript switching
+    useEffect(() => {
+        setTempValue(value);
+    }, [value]);
 
     const handleSave = () => {
         if (tempValue !== value) {
@@ -33,25 +41,37 @@ export function EditableBox({ value, onSave, className = '' } : EditableBoxProps
         }
     };
 
+    const autoResize = () => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        }
+    };
+
     return (
-        <div className={`inline-block ${className}`}>
-            {isEditing 
-                ? (<input
-                    ref={inputRef}
-                    type="text"
+        <div className={className}>
+            {isEditing ? (
+                <textarea
+                    ref={textareaRef}
                     value={tempValue}
-                    onChange={(e) => setTempValue(e.target.value)}
+                    onChange={(e) => {
+                        setTempValue(e.target.value);
+                        autoResize();
+                    }}
                     onBlur={handleSave}
                     onKeyDown={handleKeyDown}
-                    className={className}
-                />) 
-                : (<span
+                    className={`editable-box-base editing ${className}`}
+                    rows={1}
+                    style={{ resize: 'none', overflow: 'hidden' }}
+                />
+            ) : (
+                <span
                     onClick={() => setIsEditing(true)}
-                    className="cursor-pointer px-2 py-1 rounded hover:bg-gray-100"
+                    className={`editable-box-base ${className}`}
                 >
                     {value}
-                </span>)
-            }
+                </span>
+            )}
         </div>
     );
 };

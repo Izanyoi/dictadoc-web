@@ -37,7 +37,7 @@ export function Sidebar() {
         })
         .sort((a, b) => (b.time || 0) - (a.time || 0));
 
-    const selected = useWorkspaceState(state => state.workspaces[0]);
+    const workspaceStore = useWorkspaceState();
 
     return (
         <div id="Sidebar">
@@ -63,7 +63,7 @@ export function Sidebar() {
 
             <div id="NewTab" 
                 className="Tab"
-                onClick={() => useWorkspaceState().setWorkspace(0, 0)}
+                onClick={() => workspaceStore.setWorkspace(0, 0)}
             >
                 New Transcript
             </div>
@@ -73,7 +73,7 @@ export function Sidebar() {
                     <Tab 
                         Tid={entry.id} 
                         title={entry.title} 
-                        selected={entry.id===selected}/>
+                        selected={entry.id===workspaceStore.workspaces[0]}/>
                 ))}
             </div>
         </div>

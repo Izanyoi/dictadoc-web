@@ -1,0 +1,35 @@
+.EditableBox {
+  display: inline-block;
+}
+
+.EditableBox input {
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.editable-box-base {
+    display: block;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-family: inherit;
+  color: inherit;
+  width: 100%;
+
+  /* Shared styling */
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background-color: transparent;
+
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  resize: none;
+  overflow: hidden;
+}
+
+.editable-box-base.editing {
+  background-color: #f8f9fa;
+  border-color: #ccc;
+  outline: none;
+}

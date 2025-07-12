@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware';
 
@@ -10,7 +11,7 @@ type WorkspaceStore = {
 export const useWorkspaceState = create<WorkspaceStore>() (
     subscribeWithSelector((set, get) => ({
         workspaces: {
-            0: 1
+            0: 0
         },
 
         setWorkspace: (Wid, Tid) => {
@@ -24,3 +25,21 @@ export const useWorkspaceState = create<WorkspaceStore>() (
         }
     }))
 );
+
+
+type PopupStore = {
+    isOpen: boolean;
+    content: ReactNode;
+    title: string;
+
+    openPopup: (title: string, content: ReactNode) => void
+    closePopup: () => void,
+}
+
+export const usePopupStore = create<PopupStore>((set) => ({
+    isOpen: false,
+    content: null,
+    title: "",
+    openPopup: (title, content) => set({ isOpen: true, content, title }),
+    closePopup: () => set({ isOpen: false, content: null, title: "" }),
+}));

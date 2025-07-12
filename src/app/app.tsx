@@ -1,15 +1,17 @@
-import { StrictMode } from 'react'
+import { StrictMode, type MouseEvent } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Workspace } from './workspace.tsx'
 import { NewWorkspace } from './new_workspace.tsx'
 import { Sidebar } from './sidebar.tsx'
-import { useWorkspaceState } from './app_data.tsx'
+import { usePopupStore, useWorkspaceState } from './app_data.tsx'
 
 import '../styles/app.css'
 
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
+        <ErrorLog />
+        <Popup />
         <App/>   
     </StrictMode>
 )
@@ -34,3 +36,39 @@ function App() {
         </div>
     )
 }
+
+function ErrorLog() {
+    return <></>
+}
+
+// Popup component - Full screen overlay that catches ALL input
+function Popup() {
+    const PopupStore = usePopupStore();
+
+    // Handle all mouse events (click backdrop to close, block everything else)
+    const handleBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
+        // Only close if clicking the backdrop itself, not the modal content
+        if (e.target === e.currentTarget) PopupStore.closePopup();
+        e.stopPropagation();
+    };
+
+    if (!PopupStore.isOpen) return null;
+
+    return (
+        <div id="PopupShade"
+            onClick={(e) => handleBackdropClick(e)}
+            style={{ 
+                pointerEvents: 'all', // Ensure this captures ALL events
+                overflow: 'hidden'
+            }}
+        >
+            <div id="Popup">
+                <h3>{PopupStore.title}</h3>
+                <hr />
+                <div>
+                    {PopupStore.content}
+                </div>
+            </div>
+        </div>
+    );
+};

@@ -1,14 +1,11 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useCallback, memo } from 'react'
 import { useMetadataStore, useTranscriptContentStore, useLoadFullTranscript, type TranscriptEntry } from './transcript_data'
-import { formatTimestamp, playAudio, useAudioStore } from '../utils/audio'
+import { formatTimestamp, playAudio } from '../utils/audio'
 import { EditableBox } from '../component/editable_box';
 import { RecordButton } from './record_button';
-
-import React from 'react';
-
+import { useListSearch } from './search';
 
 import '../styles/workspace.css'
-
 
 
 export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
@@ -18,17 +15,16 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
     const transcriptContent = useTranscriptContentStore(state => state.transcriptContent[Tid]);
 
     const transcriptRefs = useRef<HTMLDivElement[]>([]);
-    const searchQuery = useRef("");
-    const [searchState, setSearchState] = useState({ 
-        results: [] as number[], 
-        currentIndex: -1 
-    });
+    const search = useListSearch(
+        transcriptContent?.transcript || [],
+        (entry: TranscriptEntry, query: string) => entry.content.toLowerCase().includes(query.toLowerCase())
+    );
  
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
  
     // Load transcript if not already in store
-    useEffect(() => {    
+    useEffect(() => {
         if (!metadata || !transcriptContent) {
             loadFullTranscript(Tid).catch(err => console.error(err));
         }
@@ -64,64 +60,32 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
             }
         };
 
+
         load();
     }, [transcriptContent?.audio]);
 
     // Reset search when transcript ID changes
     useEffect(() => {
-        searchQuery.current = "";
-        setSearchState({ results: [], currentIndex: -1 });
+        search.reset();
     }, [Tid]);
 
     // Called when the search is changed
     const handleSearch = (query: string) => {
-        searchQuery.current = query;
-
-        if (!query.trim()) {
-            setSearchState({
-                results: [],
-                currentIndex: -1,
-            });
-            return;
-        }
-
-        // Find all matching transcript entries
-        const results = transcriptContent.transcript.map((entry, index) => 
-                entry.content.toLowerCase().includes(query.toLowerCase()) ? index : -1
-            ).filter(
-                index => index !== -1
-            );
-
-        // Navigate to first result if any found
-        if (results.length > 0) {
-            const firstResultIndex = results[0];
+        const firstResultIndex = search.handleSearch(query);
+        if (firstResultIndex >= 0) {
             transcriptRefs.current[firstResultIndex]?.scrollIntoView({ 
                 behavior: 'smooth', 
                 block: 'start' 
             });
-
-            setSearchState({
-                results: results,
-                currentIndex: 0,
-            });
-
-        } else {
-            setSearchState({
-                results: [],
-                currentIndex: -1,
-            });;
         }
     };
  
     // Gets next search result
     const handleNext = () => {
-        if (searchState.results.length === 0) return;
+        const nextIndex = search.handleNext();
+        if (nextIndex == -1) return;
         
-        const nextIndex = (searchState.currentIndex + 1) % searchState.results.length;
-        const nextResultIndex = searchState.results[nextIndex];
-        
-        setSearchState(prev => ({ ...prev, currentIndex: nextIndex }));
-        transcriptRefs.current[nextResultIndex]?.scrollIntoView({ 
+        transcriptRefs.current[nextIndex]?.scrollIntoView({ 
             behavior: 'smooth', 
             block: 'start' 
         });
@@ -129,13 +93,10 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
 
     // Gets previous search result
     const handlePrev = () => {
-        if (searchState.results.length === 0) return;
+        const prevIndex = search.handlePrev();
+        if (prevIndex == -1) return;
         
-        const prevIndex = searchState.currentIndex === 0 ? searchState.results.length - 1 : searchState.currentIndex - 1;
-        const prevResultIndex = searchState.results[prevIndex];
-        
-        setSearchState(prev => ({ ...prev, currentIndex: prevIndex }));
-        transcriptRefs.current[prevResultIndex]?.scrollIntoView({ 
+        transcriptRefs.current[prevIndex]?.scrollIntoView({ 
             behavior: 'smooth', 
             block: 'start' 
         });
@@ -162,7 +123,7 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
                         <div>Connected</div>
                     </div>
                     
-                    <div id="SearchBox" key={Tid /*To force rerender*/}>
+                    <div id="SearchBox" key={Tid} /* To force remount to clear search result */>
                         <input id="SearchInput"
                             type='text'
                             placeholder="Search..."
@@ -176,17 +137,18 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
                     </div>
 
                     <div style={{fontSize: '10px', height: '0', margin: '0'}}>
-                        {searchQuery.current.length === 0 
+                        {search.searchQuery.length === 0 
                             ? ""
-                            : searchState.currentIndex === -1 
+                            : search.searchState.currentIndex === -1 
                                 ? "No Results Found" 
-                                : `${searchState.currentIndex + 1} of ${searchState.results.length} results`
+                                : `${search.searchState.currentIndex + 1} of ${search.searchState.results.length} results`
                         }
                     </div>
                 </div>
                 
                 <RecordButton Tid={Tid} />
             </div>
+
 
             <div id="TranscriptBox">
                 {transcriptContent.transcript.map(
@@ -199,7 +161,8 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
                                 Tid={Tid}
                                 index={index} 
                                 data={data} 
-                                selected={searchState.currentIndex >= 0 && searchState.results[searchState.currentIndex] === index}
+                                selected={search.searchState.currentIndex >= 0 
+                                    && search.searchState.results[search.searchState.currentIndex] === index}
                                 playCallback={() => {
                                     if (audioRef.current) playAudio(audioRef.current, data.timing, endTime)
                                 }}
@@ -213,7 +176,7 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
     )
 }
 
-const TranscriptEntryComponent = React.memo(
+const TranscriptEntryComponent = memo(
     function TranscriptEntryComponent({ playCallback, Tid, index, data, selected, ref }: {
         playCallback: () => void,
         Tid: number, 

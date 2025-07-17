@@ -7,7 +7,8 @@ type Status = 'connected' | 'disconnected' | 'error' | 'connecting';
 interface WebSocketState {
     status: Status;
     connect: () => void;
-    send: (data: string) => void;
+    disconnect: () => void;
+    send: (data: any) => void;
 }
 
 let socket: WebSocket | null = null;
@@ -18,15 +19,21 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => {
         set({ status });
     };
 
-    const tryReconnect = () => {
-        if (reconnectInterval) return; // Prevent multiple timers
+    const clearReconnectTimer = () => {
+        if (reconnectInterval) {
+            clearInterval(reconnectInterval);
+            reconnectInterval = 0;
+        }
+    };
 
+    const tryReconnect = () => {
+        if (reconnectInterval) return;
         reconnectInterval = setInterval(() => {
             if (get().status === 'disconnected' || get().status === 'error') {
                 console.log('Attempting to reconnect WebSocket...');
                 get().connect();
             }
-        }, 10000); // Retry every 10 seconds
+        }, 10000);
     };
 
     return {
@@ -41,6 +48,7 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => {
 
             socket.onopen = () => {
                 setStatus('connected');
+                clearReconnectTimer();
             };
 
             socket.onerror = () => {
@@ -60,7 +68,13 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => {
             }
         },
 
-        send: (data: string) => {
+        disconnect: () => {
+            socket?.close();
+            socket = null;
+            setStatus('disconnected');
+        },
+
+        send: (data: any) => {
             if (socket?.readyState === WebSocket.OPEN) {
                 socket.send(data);
             } else {

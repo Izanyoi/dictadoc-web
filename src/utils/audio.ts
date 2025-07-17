@@ -1,8 +1,12 @@
 import { create } from 'zustand'
 import { useTranscriptContentStore } from '../app/transcript_data';
+import { useWebSocketStore } from './websocket_client';
 
+const websocketRate = 100000;
 
 async function initAudio(blocking: boolean): Promise<boolean> {
+    const websocketSend = useWebSocketStore.getState().send;
+
     const fn = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -15,6 +19,17 @@ async function initAudio(blocking: boolean): Promise<boolean> {
                     chunks: [...state.chunks, e.data]
                 }));
             };
+
+            setInterval(() => {
+                const { chunks } = useAudioStore.getState();
+
+                if (chunks.length > 0) {
+                    const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+
+                    websocketSend(audioBlob);
+                    useAudioStore.setState({ chunks: [] });
+                }
+            }, websocketRate);
 
             recorder.onstop = () => {
                 const state = useAudioStore.getState();

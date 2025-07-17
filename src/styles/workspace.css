@@ -33,15 +33,17 @@ Workspace
     justify-content: space-between;
 }
 
-#TranscriptName h2 {
+.TranscriptName.Title {
     margin: 0;
     font-size: 18px;
     font-weight: 600;
     color: #333;
     line-height: 1.2;
+    height: 1.5em;
+    width: 30em;
 }
 
-#TranscriptName p {
+.TranscriptName p {
     margin: 2px 0 0 0;
     width: 300px;
     font-size: 14px;

@@ -1,16 +1,6 @@
 @import 'theme.css';
 
 .EditableBox {
-    display: inline-block;
-}
-
-.EditableBox input {
-    display: inline-block;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.editable-box-base {
     display: block;
     box-sizing: border-box;
     padding: 3px;
@@ -29,7 +19,7 @@
     overflow: hidden;
 }
 
-.editable-box-base.editing {
+.EditableBox.Editing {
     background-color: rgba(0,0,0,0.02);
     outline: none;
     border-bottom: 2px solid var(--off-black);

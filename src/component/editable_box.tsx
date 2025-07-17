@@ -2,13 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 
 import '../styles/editable_box.css';
 
-interface EditableBoxProps {
+
+interface EditableProps {
     value: string;
     onSave: (newValue: string) => void;
     className?: string;
 }
 
-export function EditableBox({ value, onSave, className = '' } : EditableBoxProps) {
+export function EditableBox({ value, onSave, className = '' } : EditableProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [tempValue, setTempValue] = useState(value);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -60,14 +61,71 @@ export function EditableBox({ value, onSave, className = '' } : EditableBoxProps
                     }}
                     onBlur={handleSave}
                     onKeyDown={handleKeyDown}
-                    className={`editable-box-base editing ${className}`}
+                    className={`EditableBox Editing ${className}`}
                     rows={1}
                     style={{ resize: 'none', overflow: 'hidden' }}
                 />
             ) : (
                 <span
                     onClick={() => setIsEditing(true)}
-                    className={`editable-box-base ${className}`}
+                    className={`EditableBox ${className}`}
+                >
+                    {value}
+                </span>
+            )}
+        </div>
+    );
+};
+
+export function EditableInput({ value, onSave, className = '' } : EditableProps) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [tempValue, setTempValue] = useState(value);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // Critical for transcript switching
+    useEffect(() => {
+        setTempValue(value);
+    }, [value]);
+
+    // Focus input when editing starts
+    useEffect(() => {
+        if (isEditing) {
+            inputRef.current?.focus();
+            inputRef.current?.select();
+        }
+    }, [isEditing]);
+
+    const handleSave = () => {
+        if (tempValue !== value) {
+            onSave(tempValue.trim());
+        }
+        setIsEditing(false);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSave();
+        } else if (e.key === 'Escape') {
+            setTempValue(value);
+            setIsEditing(false);
+        }
+    };
+
+    return (
+        <div className={className}>
+            {isEditing ? (
+                <input
+                    ref={inputRef}
+                    value={tempValue}
+                    onChange={(e) => {setTempValue(e.target.value);}}
+                    onBlur={handleSave}
+                    onKeyDown={handleKeyDown}
+                    className={`EditableBox Editing ${className}`}
+                />
+            ) : (
+                <span
+                    onClick={() => setIsEditing(true)}
+                    className={`EditableBox ${className}`}
                 >
                     {value}
                 </span>

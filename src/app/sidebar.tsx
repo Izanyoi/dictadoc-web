@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { memo, useState } from "react"
 import { useMetadataStore } from "./transcript_data"
 import { usePopupStore, useWorkspaceState } from "./app_data";
 
@@ -95,8 +95,9 @@ export function Sidebar() {
             </div>
 
             <div id="NewTab" 
+                key={0}
                 className="Tab"
-                onClick={() => workspaceStore.setWorkspace(0, 0)}
+                onClick={() => workspaceStore.setWorkspace(0,0)}
             >
                 New Transcript
             </div>
@@ -109,11 +110,20 @@ export function Sidebar() {
                         selected={entry.id===workspaceStore.workspaces[0]}/>
                 ))}
             </div>
+
+            <div className="Warning"
+                style={{
+                    backgroundColor: "orange",
+                    padding: "5px",
+                }}>
+                Please manually download the transcripts you want to keep. The web app does not save your data between sessions.
+            </div>
         </div>
     );
 }
 
-function Tab({Tid, title, selected}: {Tid: number, title: string, selected: boolean}) {
+const Tab = memo(
+    function Tab({Tid, title, selected}: {Tid: number, title: string, selected: boolean}) {
     const workspaceState = useWorkspaceState();
     
     if (!selected) return (
@@ -129,4 +139,4 @@ function Tab({Tid, title, selected}: {Tid: number, title: string, selected: bool
             {title}
         </div>
     )
-}
+})

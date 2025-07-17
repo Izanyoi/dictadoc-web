@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, memo } from 'react'
 import { useMetadataStore, useTranscriptContentStore, useLoadFullTranscript, type TranscriptEntry } from './transcript_data'
 import { formatTimestamp, playAudio } from '../utils/audio'
-import { EditableBox } from '../component/editable_box';
+import { EditableBox, EditableInput } from '../component/editable_box';
 import { RecordButton } from './record_button';
 import { useListSearch } from './search';
 
@@ -10,6 +10,7 @@ import '../styles/workspace.css'
 
 export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
     const loadFullTranscript = useLoadFullTranscript();
+    const saveTitle = useMetadataStore(state => state.updateTranscriptTitle);
 
     const metadata = useMetadataStore(state => state.metadata[Tid]);
     const transcriptContent = useTranscriptContentStore(state => state.transcriptContent[Tid]);
@@ -112,8 +113,8 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
     return (
         <div id='Main'>
             <div id='TopBar'>
-                <div id="TranscriptName">
-                    <h2>{metadata.title}</h2>
+                <div className="TranscriptName">
+                    <EditableInput value={metadata.title} onSave={(e) => saveTitle(Tid, e)} className="TranscriptName Title" />
                     <p>{metadata.time}</p>
                 </div>
                
@@ -146,6 +147,7 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
                     </div>
                 </div>
                 
+                <button>Download</button>
                 <RecordButton Tid={Tid} />
             </div>
 

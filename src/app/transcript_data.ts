@@ -321,7 +321,7 @@ export const useRemoveFullTranscript = () => {
 //TODO: Put in network_client.ts
 async function tryLoad(id: number) {
     return {
-        id: 2,
+        id: id,
         title: "Placeholder Transcript",
         time: 0,
         audio: "",

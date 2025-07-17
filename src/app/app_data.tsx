@@ -11,7 +11,7 @@ type WorkspaceStore = {
 export const useWorkspaceState = create<WorkspaceStore>() (
     subscribeWithSelector((set, get) => ({
         workspaces: {
-            0: 0
+            0: 1
         },
 
         setWorkspace: (Wid, Tid) => {

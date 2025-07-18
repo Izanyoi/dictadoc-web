@@ -1,6 +1,10 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 
+//id gen (since we're not doing server synching anymore, we can do this instead of UUIDs)
+let nextID = 10;
+
+
 // Shared types
 export type TranscriptEntry = {
     speaker: string, 
@@ -18,7 +22,7 @@ export type TranscriptMetadata = {
 // Transcript content types
 export type TranscriptContent = {
     id: number,
-    audio: string,
+    audio: Blob | null,
     transcript: TranscriptEntry[],
 }
 
@@ -125,7 +129,7 @@ type TranscriptContentStore = {
     updateTranscriptContent: (id: number, updates: Partial<Omit<TranscriptContent, 'id'>>) => void;
     removeTranscriptContent: (id: number) => void;
 
-    updateTranscriptAudio: (id: number, audio: string) => void;
+    updateTranscriptAudio: (id: number, audio: Blob | null) => void;
 
     addTranscriptEntry: (id: number, entry: TranscriptEntry) => void;
     updateTranscriptEntry: (id: number, entryIndex: number, updates: Partial<TranscriptEntry>) => void;
@@ -138,7 +142,7 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
         transcriptContent: {
             1: {
                 id: 1,
-                audio: "",
+                audio: null,
                 transcript: [
                     {speaker: "John Doe", timing: 0, content: "This is a placeholder entry"}, 
                     {speaker: "Jane Doe", timing: 1, content: "This is for testing purposes"},
@@ -148,7 +152,7 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
             },
             2: {
                 id: 2,
-                audio: "",
+                audio: null,
                 transcript: [
                     {speaker: "Alex Rodriguez", timing: 0, content: "Good morning everyone, thanks for joining today's team meeting. Let's start with our quarterly review."}, 
                     {speaker: "Sarah Chen", timing: 15, content: "I'd like to present the marketing metrics first. We've seen a 23% increase in user engagement this quarter."},
@@ -204,7 +208,7 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
                 return { transcriptContent: remaining };
             }),
         
-        updateTranscriptAudio: (id: number, audio: string) =>
+        updateTranscriptAudio: (id: number, audio: Blob | null) =>
             set(state => ({
                 transcriptContent: {
                     ...state.transcriptContent,
@@ -285,26 +289,29 @@ export const useAddFullTranscript = () => {
     const addTranscriptContent = useTranscriptContentStore(state => state.addTranscriptContent);
 
     return (transcript: {
-        id: number,
         title: string,
         time: number,
-        audio: string,
+        audio: Blob | null,
         transcript: TranscriptEntry[]
     }) => {
         const metadata: TranscriptMetadata = {
-            id: transcript.id,
+            id: nextID,
             title: transcript.title,
             time: transcript.time,
         };
         
         const content: TranscriptContent = {
-            id: transcript.id,
+            id: nextID,
             audio: transcript.audio,
             transcript: transcript.transcript,
         };
 
         addMetadata(metadata);
         addTranscriptContent(content);
+
+        nextID++;
+
+        return nextID - 1;
     };
 };
 
@@ -324,7 +331,7 @@ async function tryLoad(id: number) {
         id: id,
         title: "Placeholder Transcript",
         time: 0,
-        audio: "",
+        audio: null,
         transcript: [
             {speaker: "John Doe", timing: 0, content: "This is a placeholder entry"}, 
             {speaker: "Jane Doe", timing: 1, content: "This is for testing purposes"},

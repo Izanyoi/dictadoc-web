@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, memo } from 'react'
 import { useMetadataStore, useTranscriptContentStore, useLoadFullTranscript, type TranscriptEntry } from './transcript_data'
-import { formatTimestamp, playAudio } from '../utils/audio'
+import { createAudio, formatTimestamp, playAudio } from '../utils/audio'
 import { EditableBox, EditableInput } from '../component/editable_box';
 import { RecordButton } from './record_button';
 import { useListSearch } from './search';
@@ -33,9 +33,9 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
 
     useEffect(() => {
         const load = async () => {
-            // Only load audio if we have the transcript content and audio URL
+            // Only load audio if we have the transcript audio
             if (!transcriptContent?.audio) {
-                console.log("No audio URL available yet");
+                console.log("No audio available yet");
                 return;
             }
 
@@ -45,7 +45,7 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
                     audioRef.current = null;
                 }
 
-                const newAudio = new Audio(transcriptContent.audio);
+                const newAudio = createAudio(transcriptContent.audio);
                 
                 // Wait for audio to be ready
                 await new Promise((resolve, reject) => {
@@ -115,7 +115,7 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
             <div id='TopBar'>
                 <div className="TranscriptName">
                     <EditableInput value={metadata.title} onSave={(e) => saveTitle(Tid, e)} className="TranscriptName Title" />
-                    <p>{metadata.time}</p>
+                    <p>{new Date(metadata.time).toLocaleString()}</p>
                 </div>
                
                 <div id="CenterContainer">

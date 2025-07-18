@@ -2,7 +2,8 @@ import { create } from 'zustand'
 import { useTranscriptContentStore } from '../app/transcript_data';
 import { useWebSocketStore } from './websocket_client';
 
-const websocketRate = 100000;
+const websocketRate = 10000;
+let isStarting = false;
 
 async function initAudio(blocking: boolean): Promise<boolean> {
     const websocketSend = useWebSocketStore.getState().send;
@@ -34,9 +35,8 @@ async function initAudio(blocking: boolean): Promise<boolean> {
             recorder.onstop = () => {
                 const state = useAudioStore.getState();
                 const blob = new Blob(state.chunks, { type: "audio/ogg; codecs=opus" });
-                const audioURL = window.URL.createObjectURL(blob);
 
-                useTranscriptContentStore.getState().updateTranscriptAudio(state.recording, audioURL);
+                useTranscriptContentStore.getState().updateTranscriptAudio(state.recording, blob);
 
                 useAudioStore.setState({
                     recording: 0,
@@ -83,6 +83,10 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     setRecorder: (recorder) => set({ recorder }),
 
     startRecording: async (id) => {
+        // Prevents the async nature of this from allowing multiple calls
+        if (isStarting || get().recording != 0) return;
+        isStarting = true;
+
         let recorder = get().recorder;
 
         try {
@@ -108,9 +112,12 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         } catch (e) {
             // If recorder doesn't work, try resetting it
             if (!await initAudio(true)) {
+                // We give up
                 set({ recorder: null });
                 console.log(e);
             }
+        } finally {
+            isStarting = false;
         }
     },
 
@@ -128,6 +135,15 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         else { return "Recording" }
     }
 }));
+
+// Start the app by prompting for mic access
+initAudio(false);
+
+
+
+/**********************/
+// LIBRARY FUNCTIONS //
+/*********************/
 
 export function playAudio(audio: HTMLAudioElement, start: number, end?: number) {
     audio.currentTime = start;
@@ -162,6 +178,18 @@ export function formatTimestamp(ms: number): string {
     );
 }
 
+export function createAudio(blob: Blob) {
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
 
-// Start the app by prompting for mic access
-initAudio(false);
+    const cleanup = () => {
+        URL.revokeObjectURL(url);
+        audio.removeEventListener("ended", cleanup);
+        audio.removeEventListener("error", cleanup);
+    };
+
+    audio.addEventListener("ended", cleanup);
+    audio.addEventListener("error", cleanup);
+
+    return audio;
+}

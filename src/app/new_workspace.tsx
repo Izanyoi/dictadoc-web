@@ -1,11 +1,15 @@
 import { useRef } from 'react';
+import { useAddFullTranscript } from './transcript_data';
+import { useAudioStore } from '../utils/audio';
 import { HTTPClient } from '../utils/http_client';
 
 import '../styles/presets.css';
 import '../styles/workspace.css';
+import { useWorkspaceState } from './app_data';
+
 
 export function NewWorkspace() {
-    const fileInputRef = useRef(null);
+    const addTranscript = useAddFullTranscript();
 
     return (
         <div className="Full HFlex">
@@ -27,14 +31,29 @@ export function NewWorkspace() {
                 <input
                     id="file-upload"
                     type="file"
-                    ref={fileInputRef}
                     style={{ display: 'none' }}
                 />
             </div>
 
             {/* Record Button */}
             <div className="FlatButton 2">
-                <div className="Centered VFlex">
+                <div className="Centered VFlex"
+                    onClick={() => {
+                        const newTranscript = {
+                            title: "Untitled Transcript",
+                            time: Date.now(),
+                            audio: null,
+                            transcript: [
+                                {speaker: "John Doe", timing: 0, content: "This is a placeholder entry"}
+                            ],
+                        };
+
+                        const id = addTranscript(newTranscript);
+
+                        useAudioStore.getState().startRecording(id);
+                        useWorkspaceState.getState().setWorkspace(0,id);
+                    }}
+                >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor"

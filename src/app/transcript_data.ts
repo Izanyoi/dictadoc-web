@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 
 //id gen (since we're not doing server synching anymore, we can do this instead of UUIDs)
+//I assume nobody is going to go crazy and have like 2^16 transcripts, but might be changed to UUIDs if needed
 let nextID = 10;
 
 
@@ -26,6 +27,15 @@ export type TranscriptContent = {
     transcript: TranscriptEntry[],
 }
 
+// TS type to help pass data
+export type Transcript = {
+    id?: number,
+    title?: string,
+    time?: number,
+    audio?: Blob | null,
+    transcript?: TranscriptEntry[],
+}
+
 // Metadata Store
 type MetadataStore = {
     metadata: Record<number, TranscriptMetadata>;
@@ -44,11 +54,6 @@ export const useMetadataStore = create<MetadataStore>()(
         metadata: {
             1: {
                 id: 1,
-                title: "Placeholder Transcript",
-                time: 0,
-            },
-            2: {
-                id: 2,
                 title: "Team Meeting Discussion",
                 time: 1800,
             }
@@ -142,16 +147,6 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
         transcriptContent: {
             1: {
                 id: 1,
-                audio: null,
-                transcript: [
-                    {speaker: "John Doe", timing: 0, content: "This is a placeholder entry"}, 
-                    {speaker: "Jane Doe", timing: 1, content: "This is for testing purposes"},
-                    {speaker: "John Doe", timing: 2, content: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.".repeat(5)},
-                    {speaker: "Jane Doe", timing: 3, content: "Wow, that was long!"}
-                ]
-            },
-            2: {
-                id: 2,
                 audio: null,
                 transcript: [
                     {speaker: "Alex Rodriguez", timing: 0, content: "Good morning everyone, thanks for joining today's team meeting. Let's start with our quarterly review."}, 

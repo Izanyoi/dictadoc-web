@@ -42,3 +42,57 @@ export const usePopupStore = create<PopupStore>((set) => ({
     openPopup: (title, content) => set({ isOpen: true, content, title }),
     closePopup: () => set({ isOpen: false, content: null, title: "" }),
 }));
+
+
+type DownloadState = {
+    status: "None" | "Loading" | "Ready",
+    file: string | null,
+}
+
+type DownloadStore = {
+    downloads: Record<number, DownloadState>,
+
+    setStatus: (id: number, status: "None" | "Loading" | "Ready") => void;
+    updateFile: (id: number, url: string) => void,
+}
+
+export const useDownloadStore = create<DownloadStore>() (
+    subscribeWithSelector((set, get) => ({
+        downloads: {
+            0: {
+                status: "None",
+                file: null,
+            }
+        },
+
+        setStatus: (id, status) => {
+            const prev = get().downloads[id]?.file;
+
+            set((state) => ({
+                downloads: {
+                    ...state.downloads,
+                    [id]: {
+                        status: status,
+                        file: prev ?? null,
+                    }
+                }
+            }))
+        },
+
+        updateFile: (id, url) => {
+            const prevUrl = get().downloads[id]?.file;
+
+            set((state) => ({
+                downloads: {
+                    ...state.downloads,
+                    [id]: {
+                        status: "Ready",
+                        file: url,
+                    }
+                }
+            }));
+
+            if (prevUrl) URL.revokeObjectURL(prevUrl);
+        }
+    }))
+);

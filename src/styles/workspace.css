@@ -255,3 +255,25 @@ New Workspace
 .FlatButton:hover {
     background-color: var(--bg-hover);
 }
+
+.DownloadButton {
+    display: flex;
+    height: 40px;
+    width: 40px;
+    border: 1px solid var(--border-light);
+    border-radius: 0.5em;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 40px;
+    padding: 4px;
+    justify-content: center;
+    align-content: center;
+}
+
+.DownloadButton svg {
+    margin: auto;
+}
+
+.DownloadButton:hover {
+    background-color: white;
+}

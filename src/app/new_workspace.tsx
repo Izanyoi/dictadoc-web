@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useAddFullTranscript } from './transcript_data';
 import { useAudioStore } from '../utils/audio';
 import { HTTPClient } from '../utils/http_client';

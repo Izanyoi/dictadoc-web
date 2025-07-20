@@ -6,6 +6,8 @@ import { RecordButton } from './record_button';
 import { useListSearch } from './search';
 
 import '../styles/workspace.css'
+import '../styles/presets.css'
+import { DownloadButton } from './download_button';
 
 
 export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
@@ -70,45 +72,36 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
         search.reset();
     }, [Tid]);
 
+    const scrollTo = (index: number) => {
+        transcriptRefs.current[index]?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }
+
     // Called when the search is changed
     const handleSearch = (query: string) => {
         const firstResultIndex = search.handleSearch(query);
-        if (firstResultIndex >= 0) {
-            transcriptRefs.current[firstResultIndex]?.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-            });
-        }
+        if (firstResultIndex >= 0) scrollTo(firstResultIndex);
     };
  
     // Gets next search result
     const handleNext = () => {
         const nextIndex = search.handleNext();
-        if (nextIndex == -1) return;
-        
-        transcriptRefs.current[nextIndex]?.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
+        if (nextIndex != -1) scrollTo(nextIndex);
     }
 
     // Gets previous search result
     const handlePrev = () => {
         const prevIndex = search.handlePrev();
-        if (prevIndex == -1) return;
-        
-        transcriptRefs.current[prevIndex]?.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
+        if (prevIndex != -1) scrollTo(prevIndex);
     }
 
     // Optimization: makes stable references for memoization
     const getTranscriptRef = useCallback((index: number) => {
-        return (e: HTMLDivElement) => {
-            transcriptRefs.current[index] = e;
-        };
+        return (e: HTMLDivElement) => {transcriptRefs.current[index] = e;};
     }, []);
+
 
     return (
         <div id='Main'>
@@ -147,8 +140,10 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
                     </div>
                 </div>
                 
-                <button>Download</button>
-                <RecordButton Tid={Tid} />
+                <div className='HFlex'>
+                    <DownloadButton Tid={Tid}/>
+                    <RecordButton Tid={Tid} />
+                </div>
             </div>
 
 

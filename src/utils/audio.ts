@@ -2,8 +2,9 @@ import { create } from 'zustand'
 import { useTranscriptContentStore } from '../app/transcript_data';
 import { useWebSocketStore } from './websocket_client';
 
-const websocketRate = 10000;
+const websocketRate = 60000;
 let isStarting = false;
+let lastSend = 0;
 
 async function initAudio(blocking: boolean): Promise<boolean> {
     const websocketSend = useWebSocketStore.getState().send;
@@ -11,7 +12,9 @@ async function initAudio(blocking: boolean): Promise<boolean> {
     const fn = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const recorder = new MediaRecorder(stream);
+            const options = { mimeType: "audio/webm;codecs=opus" };
+
+            const recorder = new MediaRecorder(stream, options);
             useAudioStore.getState().stream = stream;
             useAudioStore.getState().setRecorder(recorder);
 
@@ -25,16 +28,16 @@ async function initAudio(blocking: boolean): Promise<boolean> {
                 const { chunks } = useAudioStore.getState();
 
                 if (chunks.length > 0) {
-                    const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+                    const audioBlob = new Blob(chunks.slice(lastSend), { type: "audio/webm;codecs=opus" });
+                    lastSend = chunks.length;
 
                     websocketSend(audioBlob);
-                    useAudioStore.setState({ chunks: [] });
                 }
             }, websocketRate);
 
             recorder.onstop = () => {
                 const state = useAudioStore.getState();
-                const blob = new Blob(state.chunks, { type: "audio/ogg; codecs=opus" });
+                const blob = new Blob(state.chunks, { type: "audio/webm;codecs=opus" });
 
                 useTranscriptContentStore.getState().updateTranscriptAudio(state.recording, blob);
 

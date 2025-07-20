@@ -31,7 +31,7 @@ export async function createDownloadableTranscript(id: number): Promise<string> 
 }
 
 
-export async function decodeTranscriptZip(zipBlob: Blob): Promise<Transcript> {
+export async function decodeTranscriptZip(zipBlob: Blob) {
     const zip = await JSZip.loadAsync(zipBlob);
 
     // Read transcript.txt

@@ -5,10 +5,12 @@ import { HTTPClient } from '../utils/http_client';
 import '../styles/presets.css';
 import '../styles/workspace.css';
 import { useWorkspaceState } from './app_data';
+import { decodeTranscriptZip } from './transcript_file';
 
 
 export function NewWorkspace() {
     const addTranscript = useAddFullTranscript();
+    const setWorkspace = useWorkspaceState(state=>state.setWorkspace);
 
     return (
         <div className="Full HFlex">
@@ -31,6 +33,18 @@ export function NewWorkspace() {
                     id="file-upload"
                     type="file"
                     style={{ display: 'none' }}
+                    onChange={async (e)=>{
+                        if (!e.target.files) {
+                            console.log("Upload Failed");
+                            return;
+                        }
+
+                        const file = e.target.files[0];
+                        const extractedTranscript = await decodeTranscriptZip(file);
+
+                        const id = addTranscript(extractedTranscript);
+                        setWorkspace(0, id);
+                    }}
                 />
             </div>
 

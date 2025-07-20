@@ -18,7 +18,7 @@ export function DownloadButton({ Tid }: { Tid: number }) {
                 const url = await createDownloadableTranscript(Tid);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'transcript.zip'; // Change filename/extension as needed
+                link.download = 'transcript.zip';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);

@@ -1,9 +1,9 @@
 import { StrictMode, type MouseEvent } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Workspace } from './workspace.tsx'
-import { NewWorkspace } from './new_workspace.tsx'
-import { Sidebar } from './sidebar.tsx'
-import { usePopupStore, useWorkspaceState } from './app_data.tsx'
+import { Workspace } from './components/workspace.tsx'
+import { NewWorkspace } from './components/new_workspace.tsx'
+import { Sidebar } from './components/sidebar.tsx'
+import { usePopupStore, useWorkspaceState } from './data/app_data.tsx'
 
 import '../styles/app.css'
 
@@ -28,7 +28,7 @@ function App() {
 
             <Sidebar />
             <div id="Workspace" style={{width: "100%", height: "100vh"}}>
-                {transcript === 0 
+                {transcript == "" 
                     ? <NewWorkspace/> 
                     : <Workspace Tid={transcript} Wid={0}/>
                 }

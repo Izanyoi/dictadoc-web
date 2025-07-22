@@ -1,10 +1,11 @@
-import { useAudioStore } from "../utils/audio";
+import { useAudioStore } from "../../utils/audio";
 
-import { useEffect, useRef} from 'react';
+import { useContext, useEffect, useRef} from 'react';
+import { WorkspaceContext } from "./workspace";
 
-export function RecordButton({ Tid }: { Tid: number }) {
+export function RecordButton() {
     const AudioStatus = useAudioStore(state => state);
-    const recordStatus = AudioStatus.recording === 0;
+    const recordStatus = AudioStatus.recording == null;
 
     const buttonRef = useRef<HTMLDivElement>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
@@ -12,6 +13,8 @@ export function RecordButton({ Tid }: { Tid: number }) {
     const dataArrayRef = useRef<Uint8Array | null>(null);
     const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
     const animationRef = useRef<number | null>(null);
+
+    const {Tid} = useContext(WorkspaceContext);
 
     useEffect(() => {
         if (!recordStatus && AudioStatus.stream) {

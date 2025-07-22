@@ -1,27 +1,20 @@
-import { useAudioStore } from "../utils/audio";
+import { useAudioStore } from "../../utils/audio";
 
-import { useEffect, useRef, useState} from 'react';
-import { useDownloadStore } from "./app_data";
-import { createDownloadableTranscript } from "./transcript_file";
+import { useContext, useEffect, useRef, useState} from 'react';
+import { useDownloadStore } from "../data/app_data";
+import { createDownloadableTranscript } from "../services/transcript_file";
+import { WorkspaceContext } from "./workspace";
 
 type Status = 'Ready' | 'Loading';
 
-export function DownloadButton({ Tid }: { Tid: number }) {
+export function DownloadButton() {
     const [status, setStatus] = useState<Status>('Ready');
 
     return (
         <div className="DownloadButton"
             onClick={async () => {
                 if (status == 'Loading') return;
-                
                 setStatus('Loading');
-                const url = await createDownloadableTranscript(Tid);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'transcript.zip';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
 
                 setStatus('Ready');
             }}    

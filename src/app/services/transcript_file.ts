@@ -1,9 +1,10 @@
 import JSZip from 'jszip';
-import { type Transcript, type TranscriptEntry, useMetadataStore, useTranscriptContentStore } from './transcript_data';
+import { useMetadataStore, useTranscriptContentStore } from '../data/transcript_data';
+import { type TranscriptEntry } from '../data/types';
 
 const version: string = "v1"
 
-export async function createDownloadableTranscript(id: number): Promise<string> {
+export async function createDownloadableTranscript(id: string): Promise<string> {
     const metadata = useMetadataStore.getState().metadata[id];
     const transcript = useTranscriptContentStore.getState().transcriptContent[id];
 
@@ -30,6 +31,14 @@ export async function createDownloadableTranscript(id: number): Promise<string> 
     return url;
 }
 
+export async function promptDownload(url: string, fileName: string) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
 export async function decodeTranscriptZip(zipBlob: Blob) {
     const zip = await JSZip.loadAsync(zipBlob);
@@ -48,7 +57,29 @@ export async function decodeTranscriptZip(zipBlob: Blob) {
     const version = parts[1];
     const title = parts[2];
     const time = Number(parts[3]);
+    let entries: TranscriptEntry[];
 
+    switch (version) {
+        case "v1": 
+            entries = decodeV1(parts);
+            break;
+
+        default: 
+            throw new Error('Unsupported transcript version. Make sure you are using the latest version');
+    }
+    
+    const audioBlob = await zip.file('audio.webm')?.async('blob');
+    if (!audioBlob) throw new Error('Audio file missing');
+
+    return {
+        title,
+        time,
+        audio: audioBlob,
+        transcript: entries,
+    };
+}
+
+function decodeV1(parts: string[]) {
     const entries: TranscriptEntry[] = [];
 
     // timing, speaker, content
@@ -60,13 +91,7 @@ export async function decodeTranscriptZip(zipBlob: Blob) {
         });
     }
 
-    const audioBlob = await zip.file('audio.webm')?.async('blob');
-    if (!audioBlob) throw new Error('Audio file missing');
-
-    return {
-        title,
-        time,
-        audio: audioBlob,
-        transcript: entries,
-    };
+    return entries;
 }
+
+

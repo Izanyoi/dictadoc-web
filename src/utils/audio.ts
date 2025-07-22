@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { useTranscriptContentStore } from '../app/transcript_data';
+import { useTranscriptContentStore } from '../app/data/transcript_data';
 import { useWebSocketStore } from './websocket_client';
 
 const websocketRate = 60000;
@@ -39,10 +39,10 @@ async function initAudio(blocking: boolean): Promise<boolean> {
                 const state = useAudioStore.getState();
                 const blob = new Blob(state.chunks, { type: "audio/webm;codecs=opus" });
 
-                useTranscriptContentStore.getState().updateTranscriptAudio(state.recording, blob);
+                useTranscriptContentStore.getState().updateTranscriptAudio(state.recording??"", blob);
 
                 useAudioStore.setState({
-                    recording: 0,
+                    recording: null,
                     chunks: [],
                 });
             };
@@ -67,12 +67,12 @@ type AudioStore = {
     recorder: MediaRecorder | null;
     stream: MediaStream | null;
 
-    // 0 for none, otherwise ID of the current transcript
-    recording: number,
+    // null for none, otherwise ID of the current transcript
+    recording: string | null,
     chunks: Blob[],
 
     setRecorder: (recorder: MediaRecorder) => void;
-    startRecording: (id: number) => void;
+    startRecording: (id: string) => void;
     stopRecording: () => void;
     getStatus: () => AudioStatus;
 }
@@ -80,14 +80,14 @@ type AudioStore = {
 export const useAudioStore = create<AudioStore>((set, get) => ({
     recorder: null,
     stream: null,
-    recording: 0,
+    recording: null,
     chunks: [],
 
     setRecorder: (recorder) => set({ recorder }),
 
-    startRecording: async (id) => {
+    startRecording: async (Tid) => {
         // Prevents the async nature of this from allowing multiple calls
-        if (isStarting || get().recording != 0) return;
+        if (isStarting || get().recording != null) return;
         isStarting = true;
 
         let recorder = get().recorder;
@@ -108,7 +108,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
                 return;
             }
 
-            set({ recording: id, chunks: [] });
+            set({ recording: Tid, chunks: [] });
             recorder.start();
             console.log("Recording Started");
 
@@ -126,7 +126,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
     stopRecording: () => {
         const recorder = get().recorder;
-        if (get().recording === 0 || !recorder) return;
+        if (get().recording == null || !recorder) return;
 
         recorder.stop();
         console.log("Stopped recording")
@@ -134,7 +134,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
     getStatus: () => {
         if (!get().recorder) { return "NoMic"; }
-        else if (get().recording === 0) { return "Ready"; }
+        else if (get().recording == null) { return "Ready"; }
         else { return "Recording" }
     }
 }));

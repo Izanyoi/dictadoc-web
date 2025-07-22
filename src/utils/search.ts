@@ -61,7 +61,7 @@ export function useListSearch<T>(
 
     return {
         searchState,
-        searchQuery: searchQuery.current,
+        query: searchQuery.current,
         handleSearch,
         handleNext,
         handlePrev,

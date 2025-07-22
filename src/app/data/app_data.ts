@@ -3,15 +3,15 @@ import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware';
 
 type WorkspaceStore = {
-    workspaces: Record<number, number>;
+    workspaces: Record<number, string>;
 
-    setWorkspace: (Wid: number, Tid: number) => void;
+    setWorkspace: (Wid: number, Tid: string) => void;
 }
 
 export const useWorkspaceState = create<WorkspaceStore>() (
     subscribeWithSelector((set, get) => ({
         workspaces: {
-            0: 1
+            0: ""
         },
 
         setWorkspace: (Wid, Tid) => {
@@ -50,7 +50,7 @@ type DownloadState = {
 }
 
 type DownloadStore = {
-    downloads: Record<number, DownloadState>,
+    downloads: Record<string, DownloadState>,
 
     setStatus: (id: number, status: "None" | "Loading" | "Ready") => void;
     updateFile: (id: number, url: string) => void,

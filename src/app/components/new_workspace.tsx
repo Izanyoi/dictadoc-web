@@ -1,17 +1,15 @@
-import { useAddFullTranscript } from './transcript_data';
-import { useAudioStore } from '../utils/audio';
-import { HTTPClient } from '../utils/http_client';
+import { addNewTranscript } from '../data/transcript_data';
+import { useAudioStore } from '../../utils/audio';
+import { HTTPClient } from '../../utils/http_client';
 
 import '../styles/presets.css';
 import '../styles/workspace.css';
-import { useWorkspaceState } from './app_data';
-import { decodeTranscriptZip } from './transcript_file';
+import { useWorkspaceState } from '../data/app_data';
+import { decodeTranscriptZip } from '../services/transcript_file';
 
 
 export function NewWorkspace() {
-    const addTranscript = useAddFullTranscript();
-    const setWorkspace = useWorkspaceState(state=>state.setWorkspace);
-
+    
     return (
         <div className="Full HFlex">
             {/* Upload File Button */}
@@ -41,8 +39,7 @@ export function NewWorkspace() {
 
                         const file = e.target.files[0];
                         const extractedTranscript = await decodeTranscriptZip(file);
-
-                        const id = addTranscript(extractedTranscript);
+                        const id = addNewTranscript(extractedTranscript);
                         setWorkspace(0, id);
                     }}
                 />

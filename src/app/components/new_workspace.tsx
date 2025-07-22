@@ -2,13 +2,14 @@ import { addNewTranscript } from '../data/transcript_data';
 import { useAudioStore } from '../../utils/audio';
 import { HTTPClient } from '../../utils/http_client';
 
-import '../styles/presets.css';
+import '../../styles/presets.css';
 import '../styles/workspace.css';
 import { useWorkspaceState } from '../data/app_data';
 import { decodeTranscriptZip } from '../services/transcript_file';
 
 
 export function NewWorkspace() {
+    const setWorkspace = useWorkspaceState.getState().setWorkspace;
     
     return (
         <div className="Full HFlex">
@@ -39,8 +40,8 @@ export function NewWorkspace() {
 
                         const file = e.target.files[0];
                         const extractedTranscript = await decodeTranscriptZip(file);
-                        const id = addNewTranscript(extractedTranscript);
-                        setWorkspace(0, id);
+                        const Tid = addNewTranscript(extractedTranscript);
+                        setWorkspace(0, Tid);
                     }}
                 />
             </div>
@@ -58,7 +59,7 @@ export function NewWorkspace() {
                             ],
                         };
 
-                        const id = addTranscript(newTranscript);
+                        const id = addNewTranscript(newTranscript);
 
                         useAudioStore.getState().startRecording(id);
                         useWorkspaceState.getState().setWorkspace(0,id);

@@ -7,6 +7,7 @@ export function useListSearch<T>(
     const [searchState, setSearchState] = useState({
         results: [] as number[],
         currentIndex: -1
+        
     });
 
     const searchQuery = useRef("");

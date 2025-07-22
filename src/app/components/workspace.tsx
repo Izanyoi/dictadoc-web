@@ -7,7 +7,7 @@ import { RecordButton } from './record_button';
 import { useListSearch } from '../../utils/search';
 
 import '../styles/workspace.css'
-import '../styles/presets.css'
+import '../../styles/presets.css'
 import { DownloadButton } from './download_button';
 import { motion } from 'motion/react';
 
@@ -19,7 +19,7 @@ export const WorkspaceContext = createContext<WorkspaceInfo>({
     Tid: ""
 });
 
-export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
+export function Workspace ({Tid, Wid} : {Tid: string, Wid: number}) {
     const metadata = useMetadataStore(state => state.metadata[Tid]);
     const transcriptContent = useTranscriptContentStore(state => state.transcriptContent[Tid]);
 
@@ -28,10 +28,9 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
         (entry: TranscriptEntry, query: string) => entry.content.toLowerCase().includes(query.toLowerCase())
     );
  
-    const WorkspaceContext = createContext(Tid);
 
     return (
-        <WorkspaceContext.Provider value={Tid}>
+        <WorkspaceContext.Provider value={{Tid:Tid}}>
         <div id='Main'>
             <TopBar 
                 title={metadata.title}
@@ -50,11 +49,11 @@ export function Workspace ({Tid, Wid} : {Tid: number, Wid: number}) {
 export function TopBar({title, time, searchHook}: {
     title: string,
     time: number,
-    searchHook: any
+    searchHook: any,
 }) {
     const saveTitle = useMetadataStore(state => state.updateTranscriptTitle);
 
-    const { searchState, handleSearch, handleNext, handlePrev } = searchHook;
+    const { searchState, query, handleSearch, handleNext, handlePrev } = searchHook;
 
     const {Tid} = useContext(WorkspaceContext);
 
@@ -83,7 +82,7 @@ export function TopBar({title, time, searchHook}: {
                     </div>
                 </div>
                 <div style={{fontSize: '10px', height: '0', margin: '0'}}>
-                    {searchState.searchQuery.length === 0 
+                    {query.length === 0 
                         ? ""
                         : searchState.currentIndex === -1 
                             ? "No Results Found" 

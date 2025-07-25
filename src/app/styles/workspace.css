@@ -146,6 +146,7 @@ Workspace
     color: white;
     font-weight: 500;
     cursor: pointer;
+    user-select: none;
 }
 
 #RecordButton:hover {

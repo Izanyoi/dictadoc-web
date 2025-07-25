@@ -6,64 +6,50 @@ const websocketRate = 60000;
 let isStarting = false;
 let lastSend = 0;
 
-async function initAudio(blocking: boolean): Promise<boolean> {
+async function initAudio(): Promise<boolean> {
     const websocketSend = useWebSocketStore.getState().send;
 
-    const fn = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const options = { mimeType: "audio/webm;codecs=opus" };
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const options = { mimeType: "audio/webm;codecs=opus" };
+        const recorder = new MediaRecorder(stream, options);
 
-            const recorder = new MediaRecorder(stream, options);
-            useAudioStore.getState().stream = stream;
-            useAudioStore.getState().setRecorder(recorder);
+        useRecordingStore.getState().stream = stream;
+        useRecordingStore.getState().setRecorder(recorder);
+        recorder.ondataavailable = (e: BlobEvent) => {
+            useRecordingStore.setState((state) => ({
+                chunks: [...state.chunks, e.data]
+            }));
+        };
 
-            recorder.ondataavailable = (e: BlobEvent) => {
-                useAudioStore.setState((state) => ({
-                    chunks: [...state.chunks, e.data]
-                }));
-            };
+        setInterval(() => {
+            const { chunks } = useRecordingStore.getState();
+            if (chunks.length > 0) {
+                const audioBlob = new Blob(chunks.slice(lastSend), { type: "audio/webm;codecs=opus" });
+                lastSend = chunks.length;
+                websocketSend(audioBlob);
+            }
+        }, websocketRate);
 
-            setInterval(() => {
-                const { chunks } = useAudioStore.getState();
-
-                if (chunks.length > 0) {
-                    const audioBlob = new Blob(chunks.slice(lastSend), { type: "audio/webm;codecs=opus" });
-                    lastSend = chunks.length;
-
-                    websocketSend(audioBlob);
-                }
-            }, websocketRate);
-
-            recorder.onstop = () => {
-                const state = useAudioStore.getState();
-                const blob = new Blob(state.chunks, { type: "audio/webm;codecs=opus" });
-
-                useTranscriptContentStore.getState().updateTranscriptAudio(state.recording??"", blob);
-
-                useAudioStore.setState({
-                    recording: null,
-                    chunks: [],
-                });
-            };
-            return true;
-        } catch (error) {
-            console.error("Error accessing microphone:", error);
-            return false;
-        }
-    };
-
-    if (blocking) {
-        return await fn();
-    } else {
-        fn(); // Not awaited, fire-and-forget
+        recorder.onstop = () => {
+            const state = useRecordingStore.getState();
+            const blob = new Blob(state.chunks, { type: "audio/webm;codecs=opus" });
+            useTranscriptContentStore.getState().updateTranscriptAudio(state.recording??"", blob);
+            useRecordingStore.setState({
+                recording: null,
+                chunks: [],
+            });
+        };
         return true;
+    } catch (error) {
+        console.error("Error accessing microphone:", error);
+        return false;
     }
 }
 
-type AudioStatus = "NoMic" | "Recording" | "Ready";
+type MicStatus = "NoMic" | "Recording" | "Ready";
 
-type AudioStore = {
+type RecordingStore = {
     recorder: MediaRecorder | null;
     stream: MediaStream | null;
 
@@ -74,10 +60,10 @@ type AudioStore = {
     setRecorder: (recorder: MediaRecorder) => void;
     startRecording: (id: string) => void;
     stopRecording: () => void;
-    getStatus: () => AudioStatus;
+    getStatus: () => MicStatus;
 }
 
-export const useAudioStore = create<AudioStore>((set, get) => ({
+export const useRecordingStore = create<RecordingStore>((set, get) => ({
     recorder: null,
     stream: null,
     recording: null,
@@ -95,7 +81,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         try {
             // If no recorder exists, try creating one now
             if (!recorder) {
-                const success = await initAudio(true);
+                const success = await initAudio();
                 if (!success) {
                     console.error("Failed to initialize audio");
                     return;
@@ -114,7 +100,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
         } catch (e) {
             // If recorder doesn't work, try resetting it
-            if (!await initAudio(true)) {
+            if (!await initAudio()) {
                 // We give up
                 set({ recorder: null });
                 console.log(e);
@@ -140,7 +126,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 }));
 
 // Start the app by prompting for mic access
-initAudio(false);
+initAudio();
 
 
 
@@ -155,7 +141,7 @@ export function playAudio(audio: HTMLAudioElement, start: number, end?: number) 
         const stopHandler = () => {
             if (audio.currentTime >= end) {
                 audio.pause();
-                audio.removeEventListener('timeupdate', stopHandler!);
+                audio.removeEventListener('timeupdate', stopHandler);
             }
         };
         
@@ -181,18 +167,34 @@ export function formatTimestamp(ms: number): string {
     );
 }
 
-export function createAudio(blob: Blob) {
+/**
+ * You must manually clean up the howl reference after you're done with it using .cleanup on the returned
+ * object otherwise you will cause a memory leak
+ * @param blob - the audio blob to be wrapped in a Howl
+ * @returns the associated Howl with cleanup method
+ */
+export function createHowl(blob: Blob) {
     const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-
+    const howl = new Howl({
+        src: [url],
+        preload: true,
+        format: ['mp3', 'wav', 'ogg'],
+        onloaderror: (id, error) => {
+            console.error('Failed to load audio:', error);
+            cleanup();
+        }
+    });
+   
     const cleanup = () => {
+        howl.stop();
+        howl.unload();
         URL.revokeObjectURL(url);
-        audio.removeEventListener("ended", cleanup);
-        audio.removeEventListener("error", cleanup);
     };
-
-    audio.addEventListener("ended", cleanup);
-    audio.addEventListener("error", cleanup);
-
-    return audio;
+   
+    howl.on('loaderror', cleanup);
+   
+    // Expose cleanup for manual calling
+    (howl as any).cleanup = cleanup;
+   
+    return howl;
 }

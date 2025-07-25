@@ -5,6 +5,7 @@ import { DownloadButton } from "./download_button";
 import { RecordButton } from "./record_button";
 import { WorkspaceContext, WebsocketStatusIndicator } from "./workspace";
 
+
 export function TopBar({title, time, searchHook}: {
     title: string,
     time: number,

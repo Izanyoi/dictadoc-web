@@ -40,10 +40,10 @@
     position: absolute;
   
     /* Create border by extending beyond parent */
-    top: -0.15rem;
-    right: -0.15rem;
-    bottom: -0.15rem;
-    left: -0.15rem;
+    top: -3px;
+    right: -3px;
+    bottom: -3px;
+    left: -3px;
   
     /* Rounded corners */
     border-radius: 0.7rem;

@@ -1,5 +1,5 @@
 import { addNewTranscript } from '../data/transcript_data';
-import { useAudioStore } from '../../utils/audio';
+import { useRecordingStore } from '../../utils/audio';
 import { HTTPClient } from '../../utils/http_client';
 
 import '../../styles/presets.css';
@@ -61,7 +61,7 @@ export function NewWorkspace() {
 
                         const id = addNewTranscript(newTranscript);
 
-                        useAudioStore.getState().startRecording(id);
+                        useRecordingStore.getState().startRecording(id);
                         useWorkspaceState.getState().setWorkspace(0,id);
                     }}
                 >

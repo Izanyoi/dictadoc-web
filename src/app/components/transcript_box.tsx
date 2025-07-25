@@ -1,10 +1,12 @@
 import { motion } from "motion/react";
 import { memo, useRef, useContext, useEffect } from "react";
 import { EditableBox } from "../../components/editable_box";
-import { formatTimestamp } from "../../utils/audio";
+import { formatTimestamp} from "../../utils/audio";
 import { useTranscriptContentStore } from "../data/transcript_data";
 import type { TranscriptEntry } from "../data/types";
 import { WorkspaceContext } from "./workspace";
+import { usePlaybackStore } from "../services/audio_playback";
+
 
 const TranscriptEntryComponent = memo(
     function TranscriptEntryComponent({ index, data, selected, startTime, endTime }: {
@@ -14,6 +16,7 @@ const TranscriptEntryComponent = memo(
         startTime: number,
         endTime: number,
     }) {
+        const playSegment = usePlaybackStore.getState().playSegment;
         const saveEdit = useTranscriptContentStore.getState().updateTranscriptEntry;
         const entryRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +35,7 @@ const TranscriptEntryComponent = memo(
                 className={`Transcript ${selected ? "Selected" : ""}`}
             >
                 <div className="ReplayButton"
-                    onClick={()=>{/*PlayAudio(Tid, start, end)*/}}
+                    onClick={() => {playSegment(Tid, startTime, endTime, 0);}}
                 >
                     <img src="/play-fill.svg" />
                 </div>

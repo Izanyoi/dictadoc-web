@@ -95,9 +95,9 @@ export function Sidebar() {
             </div>
 
             <div id="NewTab" 
-                key={0}
+                key={100}
                 className="Tab"
-                onClick={() => workspaceStore.setWorkspace(0,0)}
+                onClick={() => workspaceStore.setWorkspace(0,"")}
             >
                 New Transcript
             </div>
@@ -123,7 +123,7 @@ export function Sidebar() {
 }
 
 const Tab = memo(
-    function Tab({Tid, title, selected}: {Tid: number, title: string, selected: boolean}) {
+    function Tab({Tid, title, selected}: {Tid: string, title: string, selected: boolean}) {
     const workspaceState = useWorkspaceState();
     
     if (!selected) return (

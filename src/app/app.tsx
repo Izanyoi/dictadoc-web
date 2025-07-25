@@ -6,7 +6,12 @@ import { Sidebar } from './components/sidebar.tsx'
 import { usePopupStore, useWorkspaceState } from './data/app_data.ts'
 
 import './styles/app.css'
+import { usePlaybackStore } from './services/audio_playback.ts'
 
+useWorkspaceState.subscribe(
+    (state) => state.workspaces,
+    (workspaces) => {usePlaybackStore.getState().syncWithWorkspace(workspaces)}
+);
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>

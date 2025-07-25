@@ -1,10 +1,10 @@
-import { useAudioStore } from "../../utils/audio";
+import { useRecordingStore } from "../../utils/audio";
 
 import { useContext, useEffect, useRef} from 'react';
 import { WorkspaceContext } from "./workspace";
 
 export function RecordButton() {
-    const AudioStatus = useAudioStore(state => state);
+    const AudioStatus = useRecordingStore(state => state);
     const recordStatus = AudioStatus.recording == null;
 
     const buttonRef = useRef<HTMLDivElement>(null);

@@ -218,6 +218,18 @@ export function addNewTranscript(transcript: {
     return id;
 };
 
+export function createNewTranscript() {
+    const newTranscript = {
+        title: "Untitled Transcript",
+        time: Date.now(),
+        audio: null,
+        transcript: [],
+    }
+
+    const id = addNewTranscript(newTranscript);
+    return id;
+};
+
 /**
  * Removes a transcript from the stores
  * @param id - the ID of the transcript to be removed

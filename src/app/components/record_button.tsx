@@ -1,7 +1,9 @@
 import { useRecordingStore } from "../../utils/audio";
+import { v7 as uuid } from 'uuid';
 
 import { useContext, useEffect, useRef} from 'react';
 import { WorkspaceContext } from "./workspace";
+import { createNewTranscript } from "../data/transcript_data";
 
 export function RecordButton() {
     const AudioStatus = useRecordingStore(state => state);
@@ -88,6 +90,7 @@ export function RecordButton() {
             className={recordStatus ? "Idle" : "Recording"}
             onClick={() => {
                 if (recordStatus) {
+                    const Tid = createNewTranscript();
                     AudioStatus.startRecording(Tid);
                 } else {
                     AudioStatus.stopRecording();

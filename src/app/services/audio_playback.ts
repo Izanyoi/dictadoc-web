@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { Howl } from "howler";
 import { createHowl } from "../../utils/audio";
 import { useTranscriptContentStore } from "../data/transcript_data";
+import { useWorkspaceState } from "../data/app_data";
 
 type TrackState = {
     Tid: string;
@@ -200,3 +201,8 @@ export const usePlaybackStore = create<PlaybackStore>((set, get) => ({
         });
     },
 }));
+
+useWorkspaceState.subscribe(
+    (state) => state.workspaces,
+    (workspaces) => {usePlaybackStore.getState().syncWithWorkspace(workspaces)}
+);

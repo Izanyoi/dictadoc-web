@@ -11,6 +11,7 @@ interface WebSocketState {
     send: (data: any) => void;
 }
 
+
 let socket: WebSocket | null = null;
 let reconnectInterval: number;
 

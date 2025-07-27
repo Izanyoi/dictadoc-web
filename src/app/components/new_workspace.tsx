@@ -1,4 +1,4 @@
-import { addNewTranscript } from '../data/transcript_data';
+import { addNewTranscript, createNewTranscript } from '../data/transcript_data';
 import { useRecordingStore } from '../../utils/audio';
 import { HTTPClient } from '../../utils/http_client';
 
@@ -50,17 +50,7 @@ export function NewWorkspace() {
             <div className="FlatButton 2">
                 <div className="Centered VFlex"
                     onClick={() => {
-                        const newTranscript = {
-                            title: "Untitled Transcript",
-                            time: Date.now(),
-                            audio: null,
-                            transcript: [
-                                {speaker: "John Doe", timing: 0, content: "This is a placeholder entry"}
-                            ],
-                        };
-
-                        const id = addNewTranscript(newTranscript);
-
+                        const id = createNewTranscript();
                         useRecordingStore.getState().startRecording(id);
                         useWorkspaceState.getState().setWorkspace(0,id);
                     }}

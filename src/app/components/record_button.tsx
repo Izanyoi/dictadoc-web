@@ -1,9 +1,9 @@
-import { useRecordingStore } from "../../utils/audio";
 import { v7 as uuid } from 'uuid';
 
 import { useContext, useEffect, useRef} from 'react';
 import { WorkspaceContext } from "./workspace";
 import { createNewTranscript } from "../data/transcript_data";
+import { useRecordingStore } from '../services/recording';
 
 export function RecordButton() {
     const AudioStatus = useRecordingStore(state => state);

@@ -15,7 +15,7 @@ export function formatTimestamp(ms: number): string {
  * You must manually clean up the howl reference after you're done with it using .cleanup on the returned
  * object otherwise you will cause a memory leak
  * @param blob - the audio blob to be wrapped in a Howl
- * @returns the associated Howl with cleanup method
+ * @returns the associated Howl with cleanup method (audio as any).cleanup()
  */
 export function createHowl(blob: Blob) {
     const url = URL.createObjectURL(blob);

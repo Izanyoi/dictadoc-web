@@ -1,9 +1,10 @@
-import { useContext } from "react";
+import { cloneElement, useContext } from "react";
 import { EditableInput } from "../../components/editable_box";
 import { useMetadataStore } from "../data/transcript_data";
 import { DownloadButton } from "./download_button";
 import { RecordButton } from "./record_button";
-import { WorkspaceContext, WebsocketStatusIndicator } from "./workspace";
+import { WorkspaceContext } from "./workspace";
+import { useWebSocketStore } from "../../utils/websocket_client";
 
 
 export function TopBar({title, time, searchHook}: {
@@ -52,6 +53,39 @@ export function TopBar({title, time, searchHook}: {
                 <DownloadButton />
                 <RecordButton />
             </div>
+        </div>
+    )
+}
+
+function WebsocketStatusIndicator() {
+    const webSocketStatus = useWebSocketStore(state=>state.status);
+    let color: string;
+    switch (webSocketStatus) {
+        case 'connecting':
+            color = 'yellow';
+            break;
+
+        case 'connected':
+            color = 'green';
+            break;
+
+        case 'disconnected':
+            color = 'red';
+            break;
+
+        case 'error':
+            color = 'red';
+            break;
+    }
+
+    const capitalized = webSocketStatus.charAt(0).toUpperCase() + webSocketStatus.slice(1);
+
+    return (
+        <div className="connection-status">
+            <div className="status-dot" 
+                style={{backgroundColor: color}}
+            />
+            <div>{capitalized}</div>
         </div>
     )
 }

@@ -62,6 +62,9 @@ class RecorderManager {
     }
 
     private handleStop(set: any, get: any) {
+        const websocketSend = useWebSocketStore.getState().send;
+        const websocketDisconnect = useWebSocketStore.getState().disconnect;
+
         if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
@@ -69,9 +72,14 @@ class RecorderManager {
 
         const { chunks, recording } = get();
         if (chunks.length > 0 && recording) {
-            const blob = new Blob(chunks, { type: AUDIO_MIME_TYPE });
-            useTranscriptContentStore.getState().updateTranscriptAudio(recording, blob);
-            usePlaybackStore.getState().loadAudio(recording, blob);
+            const newChunks = chunks.slice(this.lastSent);
+            const lastBlob = new Blob(newChunks, { type: AUDIO_MIME_TYPE });
+            websocketSend(lastBlob);
+            websocketDisconnect();
+
+            const fullAudio = new Blob(chunks, { type: AUDIO_MIME_TYPE });
+            useTranscriptContentStore.getState().updateTranscriptAudio(recording, fullAudio);
+            usePlaybackStore.getState().loadAudio(recording, fullAudio);
         }
 
         set({ recording: null, chunks: [] });

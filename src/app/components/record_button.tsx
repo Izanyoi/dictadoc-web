@@ -1,5 +1,3 @@
-import { v7 as uuid } from 'uuid';
-
 import { useContext, useEffect, useRef} from 'react';
 import { WorkspaceContext } from "./workspace";
 import { createNewTranscript } from "../data/transcript_data";

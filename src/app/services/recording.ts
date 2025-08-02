@@ -8,6 +8,29 @@ const AUDIO_MIME_TYPE = "audio/webm;codecs=opus";
 
 type MicStatus = "NoMic" | "Recording" | "Ready";
 
+async function sendAudioChunk(blob: Blob, sequenceId: number) {
+    const websocketSend = useWebSocketStore.getState().send;
+    const arrayBuffer = await blob.arrayBuffer();
+    const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    
+    websocketSend(JSON.stringify({
+        type: 'audio',
+        sequence: sequenceId,
+        data: base64Audio,
+        timestamp: Date.now()
+    }));
+}
+
+function sendEndMessage(sequenceId: number) {
+    const websocketSend = useWebSocketStore.getState().send;
+
+    websocketSend(JSON.stringify({
+        type: 'end',
+        sequence: sequenceId,
+        timestamp: Date.now()
+    }));
+}
+
 type RecordingStore = {
     recorder: MediaRecorder | null;
     stream: MediaStream | null;
@@ -24,6 +47,7 @@ type RecordingStore = {
 class RecorderManager {
     private intervalId: number | null = null;
     private lastSent = 0;
+    private sequenceId = 0;
 
     async init(set: any, get: any): Promise<boolean> {
         try {
@@ -48,21 +72,21 @@ class RecorderManager {
 
     private startSending(get: any) {
         this.lastSent = 0;
-        const websocketSend = useWebSocketStore.getState().send;
+        this.sequenceId = 0;
         
         this.intervalId = window.setInterval(() => {
             const { chunks } = get();
             if (chunks.length > this.lastSent) {
                 const newChunks = chunks.slice(this.lastSent);
                 const blob = new Blob(newChunks, { type: AUDIO_MIME_TYPE });
-                websocketSend(blob);
+                sendAudioChunk(blob, this.sequenceId);
                 this.lastSent = chunks.length;
+                this.sequenceId++;
             }
         }, SEND_INTERVAL_MS);
     }
 
     private handleStop(set: any, get: any) {
-        const websocketSend = useWebSocketStore.getState().send;
         const websocketDisconnect = useWebSocketStore.getState().disconnect;
 
         if (this.intervalId) {
@@ -74,7 +98,8 @@ class RecorderManager {
         if (chunks.length > 0 && recording) {
             const newChunks = chunks.slice(this.lastSent);
             const lastBlob = new Blob(newChunks, { type: AUDIO_MIME_TYPE });
-            websocketSend(lastBlob);
+            sendAudioChunk(lastBlob, this.sequenceId);
+            sendEndMessage(this.sequenceId++);
             websocketDisconnect();
 
             const fullAudio = new Blob(chunks, { type: AUDIO_MIME_TYPE });

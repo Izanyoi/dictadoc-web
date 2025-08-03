@@ -1,6 +1,6 @@
-import { useWebSocketStore } from "../../utils/websocket";
 import { useTranscriptContentStore } from "../data/transcript_data";
 import { type TranscriptEntry } from "../data/types";
+import { useWebSocketStore } from "../../utils/websocket";
 
 useWebSocketStore.getState().setMessageHandler(handleMessage);
 
@@ -39,7 +39,7 @@ function handleMessage(message: string) {
 }
 
 /**
- * Parses the message using the following expected format: {Speaker}\0{Timing}\0{Transcript}\0
+ * Parses the message using the following expected format: {Speaker}\0{Timing}\0{Transcript}\n
  */
 function parse(transcript: string): TranscriptEntry[] {
     if (!transcript) return [];

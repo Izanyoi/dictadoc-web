@@ -1,11 +1,11 @@
-import { StrictMode, type MouseEvent } from 'react'
-import { createRoot } from 'react-dom/client'
-import { Workspace } from './components/workspace.tsx'
-import { NewWorkspace } from './components/new_workspace.tsx'
-import { Sidebar } from './components/sidebar.tsx'
-import { usePopupStore, useWorkspaceState } from './data/app_data.ts'
+import { StrictMode, type MouseEvent } from 'react';
+import { createRoot } from 'react-dom/client';
+import { NewWorkspace } from './components/new_workspace.tsx';
+import { Sidebar } from './components/sidebar.tsx';
+import { Workspace } from './components/workspace.tsx';
+import { usePopupStore, useWorkspaceState } from './data/app_data.ts';
 
-import './styles/app.css'
+import './styles/app.css';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>

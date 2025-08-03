@@ -1,11 +1,11 @@
 import { motion } from "motion/react";
 import { memo, useRef, useContext, useEffect } from "react";
 import { EditableBox } from "../../components/editable_box";
-import { formatTimestamp} from "../../utils/audio";
+import { WorkspaceContext } from "./workspace";
 import { useTranscriptContentStore } from "../data/transcript_data";
 import type { TranscriptEntry } from "../data/types";
-import { WorkspaceContext } from "./workspace";
 import { usePlaybackStore } from "../services/audio_playback";
+import { formatTimestamp} from "../../utils/audio";
 
 
 const TranscriptEntryComponent = memo(

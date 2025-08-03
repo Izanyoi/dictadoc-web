@@ -1,7 +1,7 @@
-import { create } from 'zustand'
-import { subscribeWithSelector } from 'zustand/middleware'
-import { type TranscriptMetadata, type TranscriptContent, type TranscriptEntry } from '../data/types.ts';
+import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
 import { v7 as uuid } from 'uuid';
+import { type TranscriptMetadata, type TranscriptContent, type TranscriptEntry } from '../data/types.ts';
 
 type MetadataStore = {
     metadata: Record<string, TranscriptMetadata>;

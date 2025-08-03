@@ -1,6 +1,6 @@
-import { useContext, useState} from 'react';
-import { createDownloadableTranscript, promptDownload } from "../services/transcript_file";
+import { useContext, useState } from 'react';
 import { WorkspaceContext } from "./workspace";
+import { createDownloadableTranscript, promptDownload } from "../services/transcript_file";
 
 type Status = 'Ready' | 'Loading';
 

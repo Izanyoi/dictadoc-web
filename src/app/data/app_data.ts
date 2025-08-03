@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { create } from 'zustand'
+import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
 type WorkspaceStore = {

@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import { EditableInput } from "../../components/editable_box";
-import { useMetadataStore } from "../data/transcript_data";
 import { DownloadButton } from "./download_button";
 import { RecordButton } from "./record_button";
 import { WorkspaceContext } from "./workspace";
+import { useMetadataStore } from "../data/transcript_data";
 import { useWebSocketStore } from "../../utils/websocket";
 
 

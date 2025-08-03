@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { Howl } from "howler";
-import { createHowl } from "../../utils/audio";
-import { useTranscriptContentStore } from "../data/transcript_data";
 import { useWorkspaceState } from "../data/app_data";
+import { useTranscriptContentStore } from "../data/transcript_data";
+import { createHowl } from "../../utils/audio";
 
 type TrackState = {
     Tid: string;

@@ -1,14 +1,12 @@
-import { createContext } from 'react'
-import { type TranscriptEntry } from '../data/types';
-import { useMetadataStore, useTranscriptContentStore } from '../data/transcript_data'
-
+import { createContext } from 'react';
 import { TopBar } from './topbar';
 import { TranscriptBox } from './transcript_box';
-
+import { useMetadataStore, useTranscriptContentStore } from '../data/transcript_data';
+import { type TranscriptEntry } from '../data/types';
 import { useListSearch } from '../../utils/search';
 
-import '../styles/workspace.css'
-import '../../styles/presets.css'
+import '../../styles/presets.css';
+import '../styles/workspace.css';
 
 
 export type WorkspaceInfo = {

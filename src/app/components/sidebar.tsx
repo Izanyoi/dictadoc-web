@@ -1,6 +1,6 @@
-import { memo, useState } from "react"
-import { useMetadataStore } from "../data/transcript_data"
+import { memo, useState } from "react";
 import { usePopupStore, useWorkspaceState } from "../data/app_data";
+import { useMetadataStore } from "../data/transcript_data";
 
 import '../styles/sidebar.css'
 

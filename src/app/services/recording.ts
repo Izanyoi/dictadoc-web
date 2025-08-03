@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
 import { useTranscriptContentStore } from '../data/transcript_data';
 import { usePlaybackStore } from '../services/audio_playback';
 import { useWebSocketStore } from '../../utils/websocket';

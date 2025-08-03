@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { useTranscriptContentStore } from '../data/transcript_data';
 import { usePlaybackStore } from '../services/audio_playback';
-import { useWebSocketStore } from '../../utils/websocket_client';
+import { useWebSocketStore } from '../../utils/websocket';
 
 const SEND_INTERVAL_MS = 60000;
 const AUDIO_MIME_TYPE = "audio/webm;codecs=opus";

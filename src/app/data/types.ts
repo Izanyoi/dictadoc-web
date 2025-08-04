@@ -10,6 +10,7 @@ export type TranscriptMetadata = {
     id: string,
     title: string,
     time: number,
+    tags?: string[],
 }
 
 // Transcript content types
@@ -24,6 +25,7 @@ export type Transcript = {
     id?: string,
     title?: string,
     time?: number,
+    tags?: string[],
     audio?: Blob | null,
     transcript?: TranscriptEntry[],
 }

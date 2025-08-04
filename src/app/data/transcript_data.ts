@@ -12,6 +12,7 @@ type MetadataStore = {
 
     updateTranscriptTitle: (id: string, title: string) => void;
     updateTranscriptTime: (id: string, time: number) => void;
+    updateTranscriptTags: (id: string, tags: string[]) => void;
 }
 
 export const useMetadataStore = create<MetadataStore>()(
@@ -61,6 +62,17 @@ export const useMetadataStore = create<MetadataStore>()(
                     [id]: state.metadata[id] ? {
                         ...state.metadata[id],
                         time
+                    } : state.metadata[id]
+                }
+            })),
+
+        updateTranscriptTags: (id: string, tags: string[]) =>
+            set(state => ({
+                metadata: {
+                    ...state.metadata,
+                    [id]: state.metadata[id] ? {
+                        ...state.metadata[id],
+                        tags
                     } : state.metadata[id]
                 }
             })),
@@ -193,6 +205,7 @@ export const useFullTranscript = (id: string) => {
 export function addNewTranscript(transcript: {
         title: string,
         time: number,
+        tags: string[],
         audio: Blob | null,
         transcript: TranscriptEntry[]}) {
 
@@ -204,6 +217,7 @@ export function addNewTranscript(transcript: {
         id: id,
         title: transcript.title,
         time: transcript.time,
+        tags: transcript.tags,
     };
     
     const content: TranscriptContent = {
@@ -222,6 +236,7 @@ export function createNewTranscript() {
     const newTranscript = {
         title: "Untitled Transcript",
         time: Date.now(),
+        tags: [],
         audio: null,
         transcript: [],
     }

@@ -11,19 +11,38 @@ export function Sidebar() {
 
     const [filters, setFilters] = useState({
         search: '',
+        tag: '',
         dateRange: { start: null, end: null },
     });
-    
-   
+
+    const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            const value = e.currentTarget.value;
+            const newTags = value.match(/#\w+/g)?.map(tag => tag.substring(1)) || [];
+            const cleaned = value.replace(/#\w+/g, '').trim();
+
+            setFilters({
+                ...filters,
+                search: cleaned,
+                tag: newTags[0] ?? '',
+            })
+        }
+    };
+
     const filteredAndSorted = Object.values(metadata || {})
         .filter(entry => {
             if (!entry) return false;
-            
+
             // Search filter
             if (filters.search && !entry.title?.toLowerCase().includes(filters.search.toLowerCase())) {
                 return false;
             }
-            
+
+            // Tag filter
+            if (filters.tag && !entry.tags?.includes(filters.tag)) {
+                return false;
+            }
+
             // Date range filter
             if (filters.dateRange.start && entry.time < filters.dateRange.start) {
                 return false;
@@ -31,7 +50,7 @@ export function Sidebar() {
             if (filters.dateRange.end && entry.time > filters.dateRange.end) {
                 return false;
             }
-            
+
             return true;
         })
         .sort((a, b) => (b.time || 0) - (a.time || 0));
@@ -89,8 +108,7 @@ export function Sidebar() {
                 <input
                     type="text"
                     placeholder="Search..."
-                    value={filters.search}
-                    onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                    onKeyDown={handleSearch}
                 />
             </div>
 

@@ -7,22 +7,39 @@ import { useMetadataStore } from "../data/transcript_data";
 import { useWebSocketStore } from "../../utils/websocket";
 
 
-export function TopBar({title, time, searchHook}: {
+export function TopBar({title, time, tags, searchHook}: {
     title: string,
     time: number,
+    tags: string[],
     searchHook: any,
 }) {
     const saveTitle = useMetadataStore(state => state.updateTranscriptTitle);
+    const saveTags = useMetadataStore(state => state.updateTranscriptTags);
 
     const { searchState, query, handleSearch, handleNext, handlePrev } = searchHook;
 
     const {Tid} = useContext(WorkspaceContext);
 
+    const handleTitleSave = (newTitle: string) => {
+        const newTags = newTitle.match(/#\w+/g)?.map(tag => tag.substring(1)) || [];
+        const cleanedTitle = newTitle.replace(/#\w+/g, '').trim();
+        saveTitle(Tid, cleanedTitle);
+        saveTags(Tid, newTags);
+    };
+
+    const handleTagRemove = (tagToRemove: string) => {
+        const newTags = tags.filter(tag => tag !== tagToRemove);
+        saveTags(Tid, newTags);
+    };
+
     return (
         <div id='TopBar'>
             <div className="TranscriptName">
-                <EditableInput value={title} onSave={(newTitle: string) => saveTitle(Tid, newTitle)} className="TranscriptName Title" />
+                <EditableInput value={title} onSave={handleTitleSave} className="TranscriptName Title" />
                 <p>{new Date(time).toLocaleString()}</p>
+                <div className="TagsContainer">
+                    {tags.map(tag => <span key={tag} className="Tag" onClick={() => handleTagRemove(tag)}>{tag}</span>)}
+                </div>
             </div>
             
             <div id="CenterContainer">

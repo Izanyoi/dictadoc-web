@@ -2,7 +2,7 @@ import JSZip from 'jszip';
 import { useMetadataStore, useTranscriptContentStore } from '../data/transcript_data';
 import { type TranscriptEntry } from '../data/types';
 
-const version: string = "v1"
+const version: string = "v2"
 
 export async function createDownloadableTranscript(id: string): Promise<string> {
     const metadata = useMetadataStore.getState().metadata[id];
@@ -13,6 +13,7 @@ export async function createDownloadableTranscript(id: string): Promise<string> 
     const contents: string[] = ["DICTADOC", version];
     contents.push(metadata.title);
     contents.push(metadata.time.toString());
+    contents.push(JSON.stringify(metadata.tags || []));
 
     transcript.transcript.forEach((entry) => {
         // Format: timing\0speaker\0content\0
@@ -55,13 +56,16 @@ export async function decodeTranscriptZip(zipBlob: Blob) {
     }
 
     const version = parts[1];
-    const title = parts[2];
-    const time = Number(parts[3]);
-    let entries: TranscriptEntry[];
+    let title: string, time: number, tags: string[], entries: TranscriptEntry[];
 
     switch (version) {
         case "v1": 
-            entries = decodeV1(parts);
+            [title, time, entries] = decodeV1(parts);
+            tags = [];
+            break;
+
+        case "v2":
+            [title, time, tags, entries] = decodeV2(parts);
             break;
 
         default: 
@@ -74,12 +78,15 @@ export async function decodeTranscriptZip(zipBlob: Blob) {
     return {
         title,
         time,
+        tags,
         audio: audioBlob,
         transcript: entries,
     };
 }
 
-function decodeV1(parts: string[]) {
+function decodeV1(parts: string[]): [string, number, TranscriptEntry[]] {
+    const title = parts[2];
+    const time = Number(parts[3]);
     const entries: TranscriptEntry[] = [];
 
     // timing, speaker, content
@@ -91,5 +98,23 @@ function decodeV1(parts: string[]) {
         });
     }
 
-    return entries;
+    return [title, time, entries];
+}
+
+function decodeV2(parts: string[]): [string, number, string[], TranscriptEntry[]] {
+    const title = parts[2];
+    const time = Number(parts[3]);
+    const tags = JSON.parse(parts[4]);
+    const entries: TranscriptEntry[] = [];
+
+    // timing, speaker, content
+    for (let i = 5; i < parts.length - 2; i += 3) {
+        entries.push({
+            timing: Number(parts[i]),
+            speaker: parts[i + 1],
+            content: parts[i + 2],
+        });
+    }
+
+    return [title, time, tags, entries];
 }

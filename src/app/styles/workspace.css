@@ -51,6 +51,25 @@ Workspace
     line-height: 1.2;
 }
 
+.TagsContainer {
+    bottom: 0;
+    display: flex;
+    gap: 0.2em;
+    margin-top: 0.2em;
+}
+
+.Tag {
+    background-color: #eee;
+    padding: 0.2em 0.5em;
+    border-radius: 0.5em;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+.Tag:hover {
+    background-color: #ddd;
+}
+
 #CenterContainer {
     position: absolute;
     top: 50%;

@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useEffect } from 'react';
 import { TopBar } from './topbar';
 import { TranscriptBox } from './transcript_box';
 import { useMetadataStore, useTranscriptContentStore } from '../data/transcript_data';
@@ -26,6 +26,10 @@ export function Workspace ({Tid, Wid} : {Tid: string, Wid: number}) {
         (entry: TranscriptEntry, query: string) => entry.content.toLowerCase().includes(query.toLowerCase())
     );
  
+    useEffect(() => {
+        search.reset();
+    }, [Tid]);
+ 
 
     return (
         <WorkspaceContext.Provider value={{Tid:Tid}}>
@@ -33,6 +37,7 @@ export function Workspace ({Tid, Wid} : {Tid: string, Wid: number}) {
             <TopBar 
                 title={metadata.title}
                 time={metadata.time}
+                tags={metadata.tags || []}
                 searchHook={search}
             />
             <TranscriptBox

@@ -48,12 +48,10 @@ function parse(transcript: string): TranscriptEntry[] {
     return lines.map(line => {
         const parts = line.split('\0');
         if (parts.length !== 3) {
-            console.warn('Invalid transcript line format:', line);
             return null;
         }
         const timing = parseInt(parts[1]);
         if (isNaN(timing)) {
-            console.warn('Invalid timing in transcript line:', line);
             return null;
         }
         return {

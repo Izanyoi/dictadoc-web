@@ -135,7 +135,19 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
                 }
             })),
         
-        addTranscriptEntry: (id: string, entry: TranscriptEntry) =>
+        addTranscriptEntry: (id: string, entry: TranscriptEntry) => {
+            //Gets the last entry of the transcript
+            const prevTranscriptLast = get().transcriptContent[id]?.transcript?.length - 1;
+            const prevEntry = get().transcriptContent[id]?.transcript?.[prevTranscriptLast - 1];
+            
+            if (prevEntry.speaker === entry.speaker) {
+                const prevText = prevEntry.content + " " + entry.content;
+
+                get().updateTranscriptEntry(id, prevTranscriptLast, { content: prevText });
+                return;
+            }
+
+            // Else, new speaker
             set(state => ({
                 transcriptContent: {
                     ...state.transcriptContent,
@@ -144,7 +156,8 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
                         transcript: [...state.transcriptContent[id].transcript, entry]
                     } : state.transcriptContent[id]
                 }
-            })),
+            }));
+        },
         
         updateTranscriptEntry: (id: string, entryIndex: number, updates: Partial<TranscriptEntry>) =>
             set(state => ({

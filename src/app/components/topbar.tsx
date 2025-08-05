@@ -87,7 +87,7 @@ function WebsocketStatusIndicator() {
             break;
 
         case 'disconnected':
-            color = 'red';
+            color = 'orange';
             break;
 
         case 'error':

@@ -101,15 +101,15 @@ Workspace
 }
 
 #SearchBox {
-  display: flex;
-  align-items: stretch;
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  box-shadow: var(--shadow-subtle);
-  overflow: hidden;
-  width: 100%;
-  max-width: 500px;
+    display: flex;
+    align-items: stretch;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    box-shadow: var(--shadow-subtle);
+    overflow: hidden;
+    width: 100%;
+    max-width: 500px;
 }
 
 #SearchInput {
@@ -123,13 +123,13 @@ Workspace
 }
 
 #SearchInput::placeholder {
-  color: var(--text-muted);
+    color: var(--text-muted);
 }
 
 #SearchBox > div {
-  display: flex;
-  flex-direction: column;
-  border-left: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border-light);
 }
 
 #SearchBox button {
@@ -145,12 +145,12 @@ Workspace
 }
 
 #SearchBox button:last-child {
-  border-bottom: none; /* remove extra border */
+    border-bottom: none; /* remove extra border */
 }
 
 #SearchBox button:hover {
-  background-color: var(--accent-light);
-  color: var(--accent-primary);
+    background-color: var(--accent-light);
+    color: var(--accent-primary);
 }
 
 #RecordButton {
@@ -228,7 +228,8 @@ Workspace
     cursor: pointer;
 }
 
-.ReplayButton img {
+.ReplayButton>* {
+    font-size: 20px;
     height: 30px;
     margin: auto;
 }

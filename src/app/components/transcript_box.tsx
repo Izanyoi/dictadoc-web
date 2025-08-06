@@ -37,7 +37,7 @@ const TranscriptEntryComponent = memo(
                 <div className="ReplayButton"
                     onClick={() => {playSegment(Tid, startTime, endTime, 0);}}
                 >
-                    <img src="/play-fill.svg" />
+                    <div>▶</div>
                 </div>
 
                 <div className="TranscriptL">

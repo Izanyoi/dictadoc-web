@@ -30,6 +30,9 @@ export function TopBar({title, time, tags, searchHook}: {
     const handleTagRemove = (tagToRemove: string) => {
         const newTags = tags.filter(tag => tag !== tagToRemove);
         saveTags(Tid, newTags);
+
+        const newTitle = title.replace(`#${tagToRemove}`, '').trim();
+        saveTitle(Tid, newTitle);
     };
 
     return (

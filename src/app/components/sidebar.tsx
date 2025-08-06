@@ -17,10 +17,9 @@ export function Sidebar() {
         dateRange: { start: null, end: null },
     });
 
-    const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
             const value = e.currentTarget.value;
-            const newTags = value.match(/#\w+/g)?.map(tag => tag.substring(1)) || [];
+            const newTags = value.match(/#\w+/g)?.map((tag: string) => tag.substring(1)) || [];
             const cleaned = value.replace(/#\w+/g, '').trim();
 
             setFilters({
@@ -28,7 +27,6 @@ export function Sidebar() {
                 search: cleaned,
                 tag: newTags[0] ?? '',
             })
-        }
     };
 
     const filteredAndSorted = Object.values(metadata || {})
@@ -41,7 +39,7 @@ export function Sidebar() {
             }
 
             // Tag filter
-            if (filters.tag && !entry.tags?.includes(filters.tag)) {
+            if (filters.tag && !entry.tags?.includes(filters.tag.toLowerCase())) {
                 return false;
             }
 
@@ -71,7 +69,6 @@ export function Sidebar() {
                     onClick={()=>openPopup("Settings", null)}
                 >
                     <svg /* Settings */
-                        xmlns="http://www.w3.org/2000/svg" 
                         fill="currentColor"
                         width="30" height="30" viewBox="0 0 16 16"
                     >
@@ -83,7 +80,6 @@ export function Sidebar() {
                     onClick={()=>openPopup("Account", null)}
                 >
                     <svg /* Account */
-                        xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor"
                         width="30" height="30" viewBox="0 0 16 16"
                     >
@@ -96,7 +92,6 @@ export function Sidebar() {
                     onClick={()=>openPopup("Submit a Bug Report", null)}
                 >
                     <svg /* Bug Report */
-                        xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor"
                         width="30" height="30" viewBox="0 0 16 16"
                     >
@@ -110,7 +105,7 @@ export function Sidebar() {
                 <input
                     type="text"
                     placeholder="Search..."
-                    onKeyDown={handleSearch}
+                    onChange={handleSearch}
                 />
             </div>
 

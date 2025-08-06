@@ -7,6 +7,9 @@ import { usePopupStore, useWorkspaceState } from './data/app_data.ts';
 
 import './styles/app.css';
 
+import { createTestTranscript } from './test';
+(window as any).createTestTranscript = createTestTranscript;
+
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <ErrorLog />

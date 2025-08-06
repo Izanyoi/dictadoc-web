@@ -138,9 +138,10 @@ export const useTranscriptContentStore = create<TranscriptContentStore>()(
         addTranscriptEntry: (id: string, entry: TranscriptEntry) => {
             //Gets the last entry of the transcript
             const prevTranscriptLast = get().transcriptContent[id]?.transcript?.length - 1;
+
             const prevEntry = get().transcriptContent[id]?.transcript?.[prevTranscriptLast - 1];
             
-            if (prevEntry.speaker === entry.speaker) {
+            if (prevEntry?.speaker === entry.speaker) {
                 const prevText = prevEntry.content + " " + entry.content;
 
                 get().updateTranscriptEntry(id, prevTranscriptLast, { content: prevText });

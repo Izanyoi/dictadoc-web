@@ -80,7 +80,32 @@
 }
 
 #NewTab {
-    height: 2em;
+    display: flex;
+    height: 2.5em;
+    background-color: #e0e7ff;
+    border-radius: 1.25em;
+    margin: 0 10px;
+    overflow: hidden;
+    border: 1px solid #c7d2fe;
+}
+
+#NewTab .Half {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: #4338ca;
+    font-weight: 500;
+}
+
+#NewTab .Half:first-child {
+    border-right: 1px solid #c7d2fe;
+}
+
+#NewTab .Half:hover {
+    background-color: #c7d2fe;
 }
 
 .Tab:hover {

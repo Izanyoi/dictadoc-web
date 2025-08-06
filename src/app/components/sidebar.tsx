@@ -1,6 +1,8 @@
 import { memo, useState } from "react";
 import { usePopupStore, useWorkspaceState } from "../data/app_data";
-import { useMetadataStore } from "../data/transcript_data";
+import { addNewTranscript, createNewTranscript, useMetadataStore } from "../data/transcript_data";
+import { decodeTranscriptZip } from "../services/transcript_file";
+import { useRecordingStore } from "../services/recording";
 
 import '../styles/sidebar.css'
 
@@ -112,13 +114,7 @@ export function Sidebar() {
                 />
             </div>
 
-            <div id="NewTab" 
-                key={100}
-                className="Tab"
-                onClick={() => workspaceStore.setWorkspace(0,"")}
-            >
-                New Transcript
-            </div>
+            <NewTab />
 
             <div id="Entries">
                 {filteredAndSorted.map(entry => (
@@ -138,6 +134,45 @@ export function Sidebar() {
             </div>
         </div>
     );
+}
+
+function NewTab() {
+    return (
+        <div id="NewTab" 
+            key={100}
+        >
+            <div className="Half FlatButton"
+                onClick={() => {
+                    const Tid = createNewTranscript();
+                    useRecordingStore.getState().startRecording(Tid);
+                    useWorkspaceState.getState().setWorkspace(0,Tid);
+                }}
+            >
+                New Recording
+            </div>
+            <div className="Half FlatButton">
+                <label htmlFor="file-upload" className="Centered VFlex">
+                    Upload File
+                </label>
+                <input
+                    id="file-upload"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={async (e)=>{
+                        if (!e.target.files) {
+                            console.log("Upload Failed");
+                            return;
+                        }
+
+                        const file = e.target.files[0];
+                        const extractedTranscript = await decodeTranscriptZip(file);
+                        const Tid = addNewTranscript(extractedTranscript);
+                        useWorkspaceState.getState().setWorkspace(0,Tid);
+                    }}
+                />
+            </div>
+        </div>
+    )
 }
 
 const Tab = memo(
